@@ -1,0 +1,1277 @@
+<title>The Gunslinger</title>
+<meta name="theme-color" content="#1E1712">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+/* Layout: one column like a paperback page — a painted plate above, the text below, a thin belt of gear at the foot. Road scenes on bone paper; memories on umber. */
+:root{
+  --bone:#E8DCC4; --dust:#C9A96E; --mustard:#B8912F; --sienna:#8A4B22; --sunline:#F2622A;
+  --peach:#F4B58A; --lavender:#A997B8; --smoke:#4A4552; --umber:#1E1712; --acid:#9ACD32;
+  --sulphur:#C9C13A; --moss:#3E6B3A; --blood:#7A1E1E; --ink:#2B2019; --inkSoft:#6B5A48;
+  --paper:var(--bone); --text:var(--ink); --muted:var(--inkSoft); --rule:#CDBB98;
+  --f-display:"IM Fell English SC","IM Fell English",Georgia,"Times New Roman",serif;
+  --f-italic:"IM Fell English",Georgia,serif;
+  --f-body:"Spectral",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--umber);color:var(--bone);font-family:var(--f-body);overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+#app{height:100%;max-width:720px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--paper);box-shadow:0 0 60px #000a}
+body.memory #app{--paper:#2A2019;--text:#E8DCC4;--muted:#A89478;--rule:#4A3A2C}
+#art{position:relative;aspect-ratio:5/3;max-height:40vh;width:100%;overflow:hidden;background:var(--umber)}
+#art svg,#art canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#art .fade{transition:opacity .9s ease}
+#memTag{position:absolute;left:12px;top:10px;font-family:var(--f-display);font-size:12px;letter-spacing:.18em;color:var(--bone);opacity:0;transition:opacity .6s;text-shadow:0 1px 3px #000}
+body.memory #memTag{opacity:.85}
+#text{overflow-y:auto;padding-block:18px 28px;padding-inline:20px;background:var(--paper);color:var(--text);transition:background .8s,color .8s;cursor:pointer;min-width:0}
+#text .inner{max-width:34em;margin:0 auto;display:flex;flex-direction:column;gap:.85em}
+.hdr{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:4px}
+.hdr .t{font-size:18px;letter-spacing:.06em;color:var(--text);text-wrap:balance}
+p.l{margin:0;font-size:17px;line-height:1.62;animation:rise .7s ease both}
+p.l.said{padding-left:1.1em;text-indent:-1.1em}
+p.chosen{margin:0;font-family:var(--f-italic);font-style:italic;color:var(--muted);font-size:15px;animation:rise .5s ease both}
+p.chosen::before{content:"— "}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.choices button{text-align:left;background:transparent;border:1px solid var(--rule);border-left:3px solid var(--sienna);padding:11px 14px;font-family:var(--f-italic);font-size:16.5px;color:var(--text);cursor:pointer;border-radius:2px}
+.choices button:hover,.choices button:focus-visible{background:#8A4B2214;outline:none;border-color:var(--sienna)}
+.more{align-self:center;font-family:var(--f-display);font-size:12px;letter-spacing:.3em;color:var(--muted);opacity:.7;animation:breathe 2.4s ease-in-out infinite;user-select:none;padding:6px}
+@keyframes breathe{50%{opacity:.25}}
+#belt{display:flex;align-items:center;gap:14px;padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));background:var(--umber);color:var(--bone);border-top:1px solid #3a2c20}
+#water{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--dust)}
+#water svg{width:22px;height:26px}
+#water .bar{width:74px;height:5px;background:#3a2c20;border-radius:3px;overflow:hidden}
+#water .bar i{display:block;height:100%;background:var(--dust);transition:width .8s}
+#belt .sp{flex:1}
+.ib{background:none;border:1px solid #3a2c20;border-radius:3px;color:var(--bone);padding:6px 10px;cursor:pointer;font-family:var(--f-display);font-size:12px;letter-spacing:.14em}
+.ib:focus-visible{outline:2px solid var(--dust)}
+#sigil{border-color:var(--lavender);color:var(--lavender)}
+#sigil[hidden]{display:none!important}
+#sigil::before{content:"◈ ";}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#120d0aee;padding:20px 16px}
+.card{width:100%;max-width:520px;max-height:100%;overflow:auto;background:var(--umber);border:1px solid #4a3a2c;padding:24px 22px;color:var(--bone)}
+.card h2{font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:.08em;margin:0 0 14px;text-wrap:balance}
+.card p{line-height:1.6;margin:0 0 12px}
+.card .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn{background:transparent;border:1px solid var(--dust);color:var(--bone);padding:10px 16px;font-family:var(--f-display);letter-spacing:.14em;font-size:14px;cursor:pointer;border-radius:2px}
+.btn:hover,.btn:focus-visible{background:#C9A96E22;outline:none}
+.btn[disabled]{opacity:.35;cursor:default}
+.echo{font-family:var(--f-italic);font-style:italic;font-size:18px;line-height:1.55;color:var(--bone)}
+.echo-h{font-family:var(--f-display);letter-spacing:.2em;font-size:12px;color:var(--lavender);margin-bottom:10px}
+textarea{width:100%;min-height:80px;background:#120d0a;color:var(--bone);border:1px solid #4a3a2c;font-family:ui-monospace,monospace;font-size:12px;padding:8px}
+.chap{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #3a2c20;padding:10px 0}
+.chap span{font-family:var(--f-display);letter-spacing:.06em}
+.chap small{color:var(--dust);font-size:12px}
+/* title */
+#title{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;background:var(--umber)}
+#title .plate{position:relative;flex:1 1 55%;min-height:200px}
+#title .plate svg{position:absolute;inset:0;width:100%;height:100%}
+#title .words{padding:18px 20px calc(22px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:10px}
+#title h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,11vw,64px);letter-spacing:.06em;margin:0;line-height:1;color:var(--bone)}
+#title .sub{font-family:var(--f-display);letter-spacing:.22em;font-size:12px;color:var(--dust)}
+#title blockquote{margin:6px 0 0;font-family:var(--f-italic);font-style:italic;font-size:19px;line-height:1.45;color:var(--bone);text-wrap:balance}
+#title cite{display:block;font-style:normal;font-family:var(--f-body);font-size:12px;color:#A89478;margin-top:4px}
+#title .adult{font-size:13px;color:#A89478}
+#title .menu{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+#title label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--bone);margin-top:4px;cursor:pointer}
+#title input[type=checkbox]{accent-color:var(--lavender);width:18px;height:18px}
+/* draw */
+#draw{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#120d0ad0;touch-action:none;user-select:none;-webkit-user-select:none}
+#draw .ring{position:relative;width:180px;height:180px}
+#draw .ring svg{width:100%;height:100%}
+#draw .cap{font-family:var(--f-display);letter-spacing:.24em;font-size:13px;color:var(--dust);text-align:center;padding:0 16px}
+#tull{position:fixed;inset:0;z-index:30;background:#000;display:flex;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none}
+#tull canvas{flex:1;width:100%;min-height:0;display:block}
+#tull .hud{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:0;right:0;display:flex;justify-content:center;gap:18px;font-family:var(--f-display);letter-spacing:.14em;font-size:14px;color:var(--bone);font-variant-numeric:tabular-nums;text-shadow:0 1px 4px #000}
+#tull .hud b{font-weight:400;color:var(--sunline);min-width:1.4em;display:inline-block;text-align:right}
+#tull .line{position:absolute;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));text-align:center;font-family:var(--f-italic);font-style:italic;font-size:18px;line-height:1.45;color:var(--bone);text-shadow:0 1px 6px #000;max-width:30em;margin:0 auto;min-height:3em}
+#tull .hint{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font-family:var(--f-display);letter-spacing:.3em;font-size:12px;color:var(--dust);opacity:.8}
+
+:root{--voice:#6A2E18}
+body.memory #app{--voice:#D9A57A}
+p.l.jake{font-style:italic;padding-left:.9em;border-left:2px solid var(--rule)}
+p.l.voice{font-family:var(--f-italic);font-style:italic;color:var(--voice);font-size:18px}
+p.l.parched{word-spacing:.18em;opacity:.78}
+.game{position:fixed;inset:0;z-index:30;background:#000;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;touch-action:none;user-select:none;-webkit-user-select:none;padding:16px}
+.game .cap{font-family:var(--f-display);letter-spacing:.24em;font-size:13px;color:var(--dust);text-align:center;transition:opacity .8s;min-height:1.2em}
+#drop .hands{width:min(86vw,440px);height:auto}
+#drop .meter{width:200px;height:4px;background:#3a2c20;border-radius:2px;overflow:hidden}
+#drop .meter i{display:block;height:100%;width:100%;background:var(--bone)}
+#drop .mib{font-family:var(--f-italic);font-style:italic;font-size:18px;line-height:1.5;max-width:28em;text-align:center;min-height:3em}
+blockquote.last{font-family:var(--f-italic);font-style:italic;font-size:clamp(26px,7vw,40px);line-height:1.3;text-align:center;max-width:15em;margin:0;text-wrap:balance}
+blockquote.last cite{display:block;font-style:normal;font-family:var(--f-body);font-size:13px;color:#A89478;margin-top:14px}
+#tarot{background:radial-gradient(ellipse at 50% 60%,#1c2a44 0%,#0a0810 70%)}
+.spread{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:520px}
+.card7{position:relative;width:74px;height:114px;background:none;border:0;padding:0;cursor:pointer;transition:transform .9s ease;border-radius:4px}
+.card7:focus-visible{outline:2px solid var(--dust);outline-offset:3px}
+.card7 .back,.card7 .face{position:absolute;inset:0;transition:opacity .5s}
+.card7 .back{background:repeating-linear-gradient(45deg,#3A2718 0 6px,#2A1C12 6px 12px);border:1.5px solid #8A6A35;border-radius:4px}
+.card7 .face{opacity:0}.card7 .face svg{width:100%;height:100%;display:block}
+.card7.up .face{opacity:1}.card7.up .back{opacity:0}
+.card7[disabled]:not(.up){opacity:.5;cursor:default}
+.card7.burn .face{animation:burn 2.2s forwards}
+@keyframes burn{0%{filter:none}35%{filter:sepia(1) saturate(5) hue-rotate(-25deg) brightness(1.3)}100%{filter:brightness(.1);opacity:0;transform:translateY(-24px) scale(.7)}}
+.reading{font-family:var(--f-italic);font-style:italic;font-size:18px;line-height:1.5;max-width:30em;text-align:center;min-height:4.5em;margin:0}
+#vision canvas{position:absolute;inset:0;width:100%;height:100%}
+#vision .vq{position:relative;z-index:2;max-width:28em;text-align:center;font-family:var(--f-italic);font-style:italic;font-size:19px;line-height:1.5}
+#vision .vq .row{display:flex;gap:10px;justify-content:center;margin-top:10px}
+#vision .cap{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:0;right:0}
+#ending{background:var(--umber)}
+#ending .endwrap{max-width:520px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+#ending .sub{font-family:var(--f-display);letter-spacing:.22em;font-size:12px;color:var(--dust)}
+#ending h2{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,9vw,54px);margin:0}
+#ending p{line-height:1.6;margin:0;color:#CDBB98}
+@media (prefers-reduced-motion:reduce){p.l,p.chosen{animation:none}.more{animation:none}.card7.burn .face{animation:none;opacity:0}#art .fade{transition:none}}
+</style>
+
+<div id="app">
+  <div id="art"><div id="memTag">REMEMBERING</div></div>
+  <div id="text" tabindex="0" aria-live="polite"><div class="inner" id="inner"></div></div>
+  <div id="belt">
+    <div id="water" title="Water"><svg viewBox="0 0 22 26" aria-hidden="true"><path d="M7 2h8v3c4 2 6 6 6 11 0 5-4 8-10 8S1 21 1 16c0-5 2-9 6-11z" fill="none" stroke="#C9A96E" stroke-width="1.4"/><path id="wfill" d="M2 16h18c0 5-4 7-9 7s-9-2-9-7z" fill="#C9A96E"/></svg><div class="bar"><i id="wbar" style="width:60%"></i></div></div>
+    <div class="sp"></div>
+    <button class="ib" id="jawBtn" hidden>JAWBONE</button>
+    <button class="ib" id="sigil" hidden>ECHO</button>
+    <button class="ib" id="menuBtn" aria-label="Menu">MENU</button>
+  </div>
+</div>
+
+<div id="title">
+  <div class="plate" id="titlePlate"></div>
+  <div class="words">
+    <div class="sub">THE DARK TOWER · I</div>
+    <h1>The Gunslinger</h1>
+    <blockquote>The man in black fled across the desert, and the gunslinger followed.<cite>Stephen King, <i>The Gunslinger</i> (1982)</cite></blockquote>
+    <div class="adult">For adult readers. A faithful walkthrough of a violent book.</div>
+    <div class="menu">
+      <button class="btn" id="bBegin">BEGIN</button>
+      <button class="btn" id="bCont" hidden>CONTINUE</button>
+      <button class="btn" id="bChap">CHAPTERS</button>
+      <button class="btn" id="bCred">CREDITS</button>
+    </div>
+    <label for="crToggle"><input type="checkbox" id="crToggle"> Constant Reader <span style="color:#A89478;font-size:12px">(echoes from further down the road)</span></label>
+  </div>
+</div>
+
+<div id="ovHost"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- storage (best effort) ---------- */
+const KEY="gunslinger.save.v1";
+const store={get(){try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){return null}},set(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- the chapter ---------- */
+const SIGILS={
+ "CR-1":"A long way from here, another man will ask whether this was real. Beyond the desert, the answer changes every time.",
+ "CR-2":"Some towns remember a gunslinger’s name for a thousand years. This one will not have the chance.",
+ "CR-3":"The preacher calls it the Beast. Others will name it by a red colour and a red eye, and the eye will outlast the rest of it."
+};
+const NODS=["A red balloon tied to a fencepost, bobbing in a wind that isn’t blowing.","A torn newspaper in the sand. The headline is about a flu. Someone called it Captain Trips.","A boy named Danny, a hotel in the snow, a room with a number on the door.","A low man in a yellow coat, asking after a lost dog that was never lost."];
+
+const S=[
+{id:"1.1",title:"Parsecs of Hardpan",kind:"road",art:"desert",amb:"wind",items:[
+"The desert went on in every direction the eye could stand to look, white hardpan and alkali and the low blue humps of devil-grass, and it went on past that.",
+"The gunslinger walked. The mule walked behind him on the end of a rope and did not want to.",
+{w:-4},
+"Ahead of him the trail of the man in black ran south and east, a line of prints in the crust so faint the wind had nearly finished them. The gunslinger read them the way a man reads a letter he already knows by heart.",
+"The sun stood overhead like a coin nailed to a door. Nothing cast a shadow but him, and the mule, and the guns.",
+"He wore two of them, low, the belts crossed at his hips. The grips were sandalwood gone dark with the oil of hands. They had been his father’s. His father had been taller.",
+{w:-4},
+"Two waterbags hung from the mule’s pack. One was nearly flat.",
+{c:"drink",opts:[
+ ["Drink now",["He drank three swallows and made himself stop at three. The water was warm and tasted of the bag. It was the best thing in the world and he hated it for that."],{w:-10}],
+ ["Ration it",["He wet his mouth and swallowed nothing. Later. There would be a later, or there would not, and either way the water would keep."],{}]
+]},
+{w:-5},
+"Toward evening he came on one of the man in black’s fires.",
+"It was a small fire, laid neat, the devil-grass burned down to a pale ash that held the shape of the stalks until he breathed on it. The man in black always left his fires like this. As if for inspection. As if he knew who would come by.",
+{c:"ash",opts:[
+ ["Kick it apart",["He kicked the ash to nothing and stood a while in the drift of it. It did no good. It never did."]],
+ ["Leave it as it lies",["He left it as it lay. There was a kind of courtesy between them, and he did not know which of them had begun it."]]
+]},
+"He slept beside it with his back to the wind. In the night the mule groaned like an old man."
+]},
+{id:"1.2",title:"The Hut at the Edge",kind:"road",art:"hut",amb:"wind",items:[
+{w:-6},
+"The next day the land began to fail as desert and fail as anything else. The hardpan broke into sand and the sand rose in long dunes the colour of old teeth, and between two of them, where no one had any business living, someone was living.",
+"A hut of sod blocks roofed with brush. A patch of corn standing yellow and stubborn in the sand. A well with a sweep and a bucket. Smoke.",
+"A man came up out of the corn as the gunslinger came down off the dune. He was young, or looked young; the sun had not finished with him yet. His hair was red and wild and stood up off his head. He carried a hoe and did not raise it.",
+{c:"door",opts:[
+ ["Rest a hand on the gun",["The gunslinger’s hand went to the gun and rested there. The young man looked at the hand and then at his face and nodded, as if that were fair."]],
+ ["Keep the hands in sight",["The gunslinger kept his hands where the young man could see them. It cost him something. He paid it."]]
+]},
+"— Rain on you, the young man said. It was a farmer’s blessing out of a wetter country, and the gunslinger had not heard it in years.",
+"— And on you.",
+"— I’m Brown. Got water. Got beans. That mule of yours won’t see morning.",
+"Something black dropped off the roof of the hut and landed on Brown’s shoulder and looked at the gunslinger with one eye and then with the other.",
+"— That’s Zoltan, Brown said.",
+"The raven opened its beak. — Go to hell, it said, very clearly, and settled its feathers.",
+{c:"raven",opts:[
+ ["Answer the bird",["— I’ve been, the gunslinger told it. The raven considered this and seemed to find it acceptable."]],
+ ["Look past it",["The gunslinger looked past the bird at the well. The bird did not like to be looked past. It said something else, worse."]]
+]}
+]},
+{id:"1.3",title:"Beans and Grace",kind:"road",art:"interior",amb:"fire",sigil:"CR-1",items:[
+"The mule lay down in the dooryard before the light went, folded its legs under it like a dog, and died without complaint. It had complained across the whole of the desert and at the end it had nothing to say.",
+"Before he had the pack off it the raven was down on its head. The gunslinger watched the bird at its work and did not stop it. The eyes went first. The bird was tidy about it.",
+"Brown drew water. The gunslinger filled both bags and drank until his belly hurt, and then drank again.",
+{w:100,set:true},
+"Inside, the hut was one room: a hearth, a pallet, a lamp of pressed grease that smoked. Brown set out beans and roasted corn on a plank and sat down across from him and folded his hands.",
+{c:"grace",opts:[
+ ["Bow for the grace",["The gunslinger bowed his head. Brown thanked a god for the corn and the water and the stranger, in that order, and the gunslinger found he did not mind being third."]],
+ ["Watch the dark",["Brown bowed his head and thanked a god for the corn and the water and the stranger. The gunslinger watched the door, and the dark beyond the door, and the raven on the sill, which watched him back."]]
+]},
+"They ate. The beans were good. The raven hopped in and said a rhyme about beans that was not fit for a table, and Brown laughed until he wheezed.",
+"The gunslinger watched him laugh. It was a real laugh. That proved nothing. He had seen what the man in black could do with a dead man; a laugh would be nothing to him.",
+{c:"real",opts:[
+ ["Ask if he is real",["— Are you real? the gunslinger said.","Brown wiped his eyes. — As I’ll ever be. You want me to cut myself, show you it bleeds?","— No.","— Then I guess you’ll have to wonder."]],
+ ["Keep silent",["He said nothing. If Brown was a thing set down in his road, then the thing had set out beans, and the beans were in him now, and there was no undoing that."]]
+]}
+]},
+{id:"1.4",title:"Brown Asks",kind:"road",art:"embers",amb:"fire",items:[
+"Later the lamp burned low and neither of them moved to fix it. Wind worked at the sod. Somewhere out on the dunes a thing cried once and stopped.",
+"— You came through Tull, Brown said. It was not a question. There was only the one road.",
+"— I came through Tull.",
+"— Folks there aren’t much. But they’re folks.",
+"The gunslinger took out his tobacco and his papers and rolled a cigarette with great care, and lit it at the lamp, and looked at it.",
+"— Not anymore, he said.",
+{c:"tell",opts:[
+ ["Tell it plain",["— I killed them, he said. All of them. You want the why, I’ll give it to you. But that’s the whole of it, and the why doesn’t change it."]],
+ ["Tell it slow",["— I’ll tell it from the start, he said. It went slow, and then it went all at once. Maybe if I tell it slow enough it comes out different."]]
+]},
+"Brown waited. The raven waited. The gunslinger remembered."
+]},
+{id:"1.5",title:"The Piano Through the Wall",kind:"memory",art:"street",amb:"piano",items:[
+"Tull at sundown. One street, and the street a gut of red dust between two rows of false fronts that leaned together like drunks. Past it, a church. Past that, nothing.",
+"He came in on the mule, which was alive then. Boys playing marbles in the dirt left off playing and looked at him and did not look away.",
+"From the saloon came a piano. Someone was playing “Hey Jude” on it, badly, a song out of some other world washed up here like wreckage off a sea. He knew the tune without knowing how he knew it.",
+"He tied the mule and went in. The piano stopped. It started again. The room was full and silent, men at the tables with their hats on, and every face turned to him and then turned carefully away.",
+"The piano player was a thin man with a bad mouth. The woman behind the bar had a scar on her forehead, white and old, and a pale used face, and she was not afraid of him, or pretended well.",
+{c:"sit",opts:[
+ ["The bar",["He went to the bar and put his back to the room. It was a thing he did sometimes, to see what a room would do with his back."]],
+ ["The wall",["He took a table against the wall where he could see the whole room and the whole room could see him seeing it."]],
+ ["The door",["He stood near the door. A man by the door can be anywhere in a moment. A man by the door is also always half gone, and the room knew it."]]
+]},
+"He laid a gold piece on the wood. The woman looked at it a long time.",
+"— Beer, he said. And meat, if there’s meat.",
+"— There’s burgers.",
+"— Then burgers.",
+"While he ate, a man came in off the street. He came slowly and his feet did not seem to know the floor. His teeth were green to the gums and his eyes were the eyes of a man looking at something far off and liking it. A weed-eater. The whole room drew in from him.",
+"He stopped by the gunslinger’s table and bent down, and the smell of him was sweet and rotten, and he spoke. It was the High Speech. The gunslinger had not heard it from any mouth but his own in twelve years. It came out of that ruined mouth whole and clean and courtly, a greeting such as one lord gives another at a gate.",
+{c:"nort",opts:[
+ ["Answer in the High Speech",["The gunslinger answered in kind. His own voice sounded strange to him, too careful, like a man crossing a floor he has been told is rotten. The weed-eater smiled with his green teeth and went away to a corner and lay down."]],
+ ["Turn away",["The gunslinger turned his face to his plate. After a while the weed-eater said the greeting again, more softly, the way a man repeats a thing to a child, and then went away to a corner and lay down."]]
+]},
+"The piano took up again.",
+"— That’s Nort, the woman said, taking his plate. Pay him no mind. He’s dead."
+]},
+{id:"1.6",title:"Allie’s Price",kind:"memory",art:"lamp",amb:"piano",sigil:"CR-2",items:[
+"Her name was Allie. She told him that later, upstairs, in a room with a lamp and a curtain and a bed that sagged toward the middle as if something heavy had lain there a long time.",
+"— You want to know about the man in black, she said. I can see it on you. I’ll tell you. It isn’t free.",
+{c:"price",opts:[
+ ["Offer gold",["He put gold on the table. She looked at it and then at him and did not pick it up.","— That’s not the price, she said.","He understood her. He put the gold away."]],
+ ["Name her price for her",["— I know what the price is, he said.","She looked at him a long moment, and then she turned the lamp down."]]
+]},
+"Afterward she lay with her back to him and told it to the wall.",
+"Nort had eaten the grass until it ate him. He died in the street in high summer with the flies on him. They waked him in the saloon, such as a wake is in Tull, which is drinking and cards and the dead man on a table by the stove.",
+"— And he came, she said. Out of the desert. A wind came up the street ahead of him and blew the lamps down, and he came in with his hood up, laughing. Like he’d heard a joke out there and carried it all this way to tell us.",
+"He bent over Nort. He did things. She would not say what things. When he straightened, Nort sat up on the table and asked for a drink.",
+"— Then he went on. South and east. He didn’t even stay the night.",
+"— And Nort?",
+"— Nort’s been down there. Wherever it is. He’s been, and he came back, and he walks around and eats his grass and nobody asks him. Nobody asks him what it’s like.",
+"She was quiet a while.",
+"— I think about asking him, she said. Nights. I think about it all the time.",
+{c:"ask",opts:[
+ ["Ask if anyone has",["— Has anyone asked him? he said.","— No.","— Don’t, he said.","She laughed without any sound. — You think I don’t know that?"]],
+ ["Leave it unasked",["He did not ask her what she thought Nort would say. He had an idea it was the only thing in Tull worth knowing, and that knowing it would be the end of whoever knew."]]
+]}
+]},
+{id:"1.7",title:"Four Days",kind:"memory",art:"barn",amb:"wind",items:[
+"He stayed four days. He could not afterward have said why. His body had been in the desert a long time and was glad of a bed, and his mind was glad of nothing, and between them they let him stay.",
+"In Allie’s room he found a magazine, very old, its pages gone the colour of tea. There were pictures in it of people in bright clothes standing beside machines. Most of the words he could not read.",
+{c:"mag",opts:[
+ ["Turn the pages",["He turned the pages slowly, one each night, the way a man spends coins he knows are the last. The people in the pictures smiled at him out of a world that had not yet moved on. He did not smile back."]],
+ ["Put it face down",["He looked at it once and put it face down. It was a thing from before, and the before was gone, and looking at it only made the room smaller."]]
+]},
+"He went to the livery to see about the mule. The hostler was named Kennerly, a man with a slack wet mouth and too many daughters, who watched the gunslinger the way a dog watches a man with a stick.",
+"— What’s past the desert? the gunslinger asked him.",
+"Kennerly scratched. — Mountains, I hear. Past them a sea, I hear. Green water. I hear there’s things in the mountains you don’t want to meet. Never been. Nobody from here has been.",
+"— Somebody came from out there.",
+"Kennerly’s eyes moved. — The preacher woman, he said. You ought to hear her sometime. Sunday.",
+"Behind him in the dark of the barn a girl stood watching with a length of stovewood in her hands. His daughter Soobie. She was the size of a man and had not blinked since the gunslinger walked in.",
+{c:"kenn",opts:[
+ ["Believe him",["The gunslinger believed him. Men like Kennerly lie about small things and tell the truth about large ones, out of laziness."]],
+ ["Believe none of it",["The gunslinger believed none of it except the word about the preacher, and he believed that because Kennerly had not wanted to say it."]]
+]}
+]},
+{id:"1.8",title:"Wrists",kind:"memory",art:"knife",amb:"none",items:[
+"On the third night the piano player came up the stairs.",
+"The gunslinger heard him on the fourth step, which spoke. He heard him stop on the landing and breathe. Allie was asleep. Then Allie was not.",
+"The door came open and the piano player came through it with a kitchen knife held low, like a man who has seen it done and never done it. He was crying. He said Allie’s name and something about years.",
+"The gunslinger’s hands moved.",
+{draw:"wrists"},
+"He did not use the guns. There was no need of them. He took the man’s wrists, one and then the other, and bent them in a direction wrists are not made to go, and there was a sound like green sticks.",
+"The piano player sat down on the floor with his hands in his lap and looked at them.",
+"— Sheb, Allie said. Oh, Sheb. She did not say it with love. She said it the way you say the name of weather.",
+"Sheb went down the stairs on his knees and elbows. The next night someone else played the piano, worse."
+]},
+{id:"1.9",title:"The Sermon",kind:"memory",art:"church",amb:"none",sigil:"CR-3",items:[
+"Sunday. The church stood at the end of the street with its back to the desert. It was built of raw planks that had shrunk in the sun until the daylight came through between them in bars, so that the people inside sat in a cage of light.",
+"He came late. The benches were full. The whole town was there, the whole town that would be dead in two days, sitting close with their hats in their laps.",
+{c:"pew",opts:[
+ ["Sit at the back",["He sat on the end of the last bench. The man beside him moved away the width of a hand, and then the width of another."]],
+ ["Stand in the door",["He stood in the door with the desert at his back. It was a place to stand if you wanted to leave, and a place to stand if you wanted everyone to know that you could."]]
+]},
+"The preacher was a woman. She was huge. She filled the pulpit and overflowed it, and when she moved, the pulpit moved with her. Her voice was low and sweet and went into a person like water into sand.",
+"She preached the Interloper. She said he walked among them in the shape of a man. She named him the Antichrist and she named the Beast his master, and she said the Last Times had come to the desert and to Tull. She said the Interloper would come with guns. The gunslinger felt the heads on the benches not turn.",
+"Halfway through he had the feeling he had heard all of it before. Not a sermon like it: this sermon, this woman, this light between these boards. As if he had dreamed it long ago and forgotten, and was being made to remember it a word at a time.",
+{c:"stay",opts:[
+ ["Stay to the end",["He stayed. It would have been a kind of answer to leave, and he did not want to give her one."]],
+ ["Go",["He rose to go. At the door he found he had not gone. He was standing with his hand on the frame, listening, and he stood like that until the end."]]
+]},
+"When it was over they filed out past him and none of them looked at him, and the preacher came last and looked at nothing else.",
+"— Sylvia Pittston, Allie told him that night. Came out of the desert three, four years back. Same way he went. She has a shack behind the church. Don’t go there."
+]},
+{id:"1.10",title:"The Shack",kind:"memory",art:"slit",amb:"none",items:[
+"He went there.",
+"It was full dark. The shack had one window and the window had a board across it with a crack in the board, and through the crack came one line of yellow light that lay on the ground like a thing dropped.",
+"She opened before he knocked. She had been waiting.",
+"— He said you would come, she said, and let him in.",
+"Inside it smelled of tallow and of her. She sat on the bed, which was a great deal of bed, and folded her hands over her belly, and smiled.",
+"— He lay with me, she said. The man of God. He came down out of the desert and lay with me and I carry his child. An angel. Do you understand? I carry an angel for him.",
+"The gunslinger looked at her belly and at her hands on it. He thought of Nort sitting up on the table. He thought of what the man in black left behind him, always, laid neat, for inspection.",
+{c:"shack",opts:[
+ ["“It’s no angel.”",["— It’s no angel, he said.","She laughed at him. She was still laughing when he drew."]],
+ ["“Where did he go?”",["— Where did he go? he said.","— To the mountains, she said. Past them. He waits on the far side to make his strength.","She told him freely, smiling, the way you tell a thing that can do you no harm. Then he drew."]],
+ ["“This won’t be long.”",["— This won’t be long, he said.","She understood him then. She stopped smiling. It did not help her."]]
+]},
+"What he did then he did with the barrel of his gun, and he did it quickly, and the thing inside her that was not a child died of it. She screamed once. It was not her scream. It came up out of her in a voice like a bird’s and went out through the crack in the board into the night.",
+{unless:["shack",1],t:"When she could speak again she told him where the man in black had gone: over the mountains, and waiting on the far side, gathering himself. She told him with hate. It was the first true thing he had heard in Tull."},
+"He went out. Behind him the line of yellow light lay on the ground where it had lain before, and nothing about it had changed."
+]},
+{id:"1.11",title:"Storm",kind:"memory",art:"storm",amb:"storm",items:[
+"By morning the wind had turned. It came off the desert brown, carrying the desert with it, and the sun went out behind it like a lamp behind a sack.",
+"He knew what the wind meant. He knew what Sylvia Pittston had done with her night, going door to door with her great soft voice. He went to the livery for the mule.",
+"Kennerly was there and not glad to be. He talked about the weather and the price of feed and his daughters, and while he talked he stood between the gunslinger and the mule, and his eyes went to the barn door, and to the barn door, and to the barn door.",
+"The girl Soobie came out of the stall behind him with the stovewood. The gunslinger stepped out of the way of it. It went past his head into the post, and the post shook, and dust came down.",
+{c:"mule",opts:[
+ ["Take the mule by the bridle",["He took the mule by the bridle and led it out past them. Neither of them tried again. They had done what they were told, and it had been enough to hold him, and holding him was all anyone had asked."]],
+ ["Cut it loose",["He drew his knife to cut the tether and let the mule run. Then he did not. He would need it in the desert, if there was a desert after this. He led it out past them."]]
+]},
+"When he came into the street the street was full."
+]},
+{id:"1.12",title:"The Street",kind:"memory",art:"canted",amb:"storm",items:[
+"They came out of the brown air all at once, the whole town, men and women and the children behind them, with what they had. Hoes. Scythes. Boards with nails through them. Bricks. A butcher’s cleaver. They came silent and then they were not silent. They were shouting a word. The word was Satan.",
+"In front of them, held before him like a door, the piano player had Allie. His ruined hands were wrapped in rags and one of them was knotted in her hair, and he walked her ahead of him up the street.",
+"— Please, she said. She was looking at the gunslinger. Please don’t. Please don’t shoot me. Please.",
+"His hands did what they had been made to do.",
+{tull:true},
+"The wind dropped. The dust began to settle on them, on all of them, evenly, as if the desert had been waiting for this and had come to take back what it had lent."
+]},
+{id:"1.13",title:"The Dead Town",kind:"memory",art:"deadtown",amb:"wind",items:[
+"He counted them. It took a long while. Thirty-nine men. Fourteen women. Five children. He counted the children twice.",
+"Then he went into the saloon, because there was nowhere else to go.",
+"Nort was there. Someone had hung him on the wall behind the bar, through the hands, the way a man nails a coyote to a fencepost for a lesson to the others. His green mouth hung open. He was dead again, and this time it had taken.",
+{c:"nortdown",opts:[
+ ["Cut him down",["He cut him down and laid him on the floor and put a tablecloth over him. It was the only burial anyone in Tull would get."]],
+ ["Leave him hanging",["He looked at him a long time. Then he cut him down after all, because he found he could not eat with Nort watching, and he laid him on the floor under a tablecloth."]]
+]},
+"He ate what was in the kitchen. He drank what was behind the bar. He tasted none of it.",
+{c:"bed",opts:[
+ ["Sleep in her bed",["He went up and lay down in Allie’s bed, in the hollow in the middle of it, and slept at once."]],
+ ["Sleep on the floor",["He lay down on the floor of her room with his back to the door. In the night he got up without waking and lay down in the bed. In the morning he did not remember doing it."]]
+]},
+"At dawn he walked the mule down the street between them and out into the desert. He did not look back, and the town did not look after him. It had nothing left to look with."
+]},
+{id:"1.14",title:"He’s Close",kind:"road",art:"dawn",amb:"wind",items:[
+"The lamp had gone out. Brown sat in the dark with his hands between his knees. The raven slept on the roof beam with its head under its wing.",
+"— Well, Brown said after a long time.",
+"— Well.",
+"— You feel better? Telling it?",
+"The gunslinger thought about it honestly. — No, he said.",
+"Brown nodded as though that were the answer he had expected. — He was through here, he said. Your man. Not so long ago. He’s closer than you think.",
+"In the morning Brown walked him to the edge of the corn.",
+"— I’ll eat your mule, he said. If that’s all right.",
+"— It’s all right.",
+{c:"part",opts:[
+ ["Thank him",["— Thank you for the water, the gunslinger said. It was more than he had said to anyone in a year. Brown looked surprised, and then embarrassed, and then he raised his hand."]],
+ ["Look back from the dune",["He did not thank him. But at the top of the first dune he turned and looked back, and Brown was still standing at the edge of the corn with the raven on his shoulder, and Brown raised his hand, and the gunslinger raised his."]]
+]},
+{w:-6},
+"Then the dune was between them, and there was only the desert again, and the line of prints going south and east."
+]},
+{id:"1.15",title:"Not of Tull",kind:"road",art:"dream",amb:"wind",items:[
+{w:-6},
+"That night he made his fire of devil-grass, small, and lay down beside it with the guns under his hands.",
+"He thought he would dream of Tull. Of her face in front of the piano player’s. Of the count.",
+"He dreamed of Cort.",
+"He dreamed of the yard behind the great hall in Gilead, and the sun on the stones, and the old man with his staff and his broken nose, standing over a boy who had fallen and was not yet sure he wanted to get up.",
+"— Up, said Cort. Have you forgotten the face of your father? Up.",
+"In the dream the boy got up.",
+{end:1}
+]},
+/* ===== CHAPTER TWO — THE WAY STATION ===== */
+{id:"2.1",title:"Sixteen Days",kind:"road",art:"sixteen",amb:"wind",items:[
+"Sixteen days out of Brown’s, the gunslinger stopped counting days.",
+{w:-10},
+"The devil-grass had given out. There were no more fires to find, his or anyone’s. He lay under his blanket through the worst of the day with the blanket over his face and the sun coming through it red.",
+{c:"walk",opts:[
+ ["Walk by night",["He walked by night, by Polaris, which did not move, and the sand was cold through his boots, and in the dark he could not see how far there was still to go. That was a mercy of a kind."]],
+ ["Walk by day",["He walked by day because the prints were easier to read by day. The sun stood on his hat like a hand pressing down. By noon he was reading prints that were not there."]]
+]},
+{w:-12},
+"The waterbags went slack. Then one went flat, and he rolled it and tied it and carried it anyway, because it had been water once.",
+{c:"last",opts:[
+ ["Drink the last",["He drank the last of it at dusk, all at once, and lay back and felt it go into him like rain into a crack in the ground, and be gone."],{w:-22}],
+ ["Save it",["He kept it. A mouthful at dawn, a mouthful at dusk. The water moved in the bag with a small sound, like someone talking in the next room."],{w:-9}]
+]},
+{w:-8},
+"A rhyme had come into his head, a song out of a world that wasn’t his, and it would not go. Down the dune and up the dune, and the bone-white moon, and soon, soon. He said it under his breath until it meant nothing, and then he said it some more.",
+{low:"The prints ran together. Twice he found he had been following his own."},
+{low:"He talked to the mule for an hour before he remembered Brown was eating the mule."},
+"On the sixteenth day, or the twentieth, he fell down and did not get up for a while. When he did get up he saw buildings.",
+"They swam in the heat. He watched them a long time, waiting for them to go away the way the others had. They did not go away."
+]},
+{id:"2.2",title:"The Figure",kind:"road",art:"station",amb:"wind",items:[
+"A way station. A long low roof of weathered boards gone silver, a stable with half its wall fallen in, a trough, a fence. The coaches had stopped coming here before anyone now living was born.",
+"Someone was standing in the shade of the stable.",
+"The gunslinger’s heart began to pound, slow and hard. The figure was dark against the dark of the doorway, and small with distance, and still. He had followed it across the whole of the desert.",
+{draw:"held"},
+"He came on with the gun out. The figure did not move. Then it moved, and stepped out into the light, and it was a boy.",
+"A boy with dark hair and a sunburned face, in clothes that were wrong for this place or any place the gunslinger knew. He stood with his hands at his sides and watched the gun come and did not run.",
+"The gunslinger put the gun away. Then he fell down."
+]},
+{id:"2.3",title:"The Pump",kind:"road",art:"pump",amb:"pump",sigil:"CR-4",items:[
+"He woke in the shade with water on his face. The boy knelt over him with a tin dipper, and the water was cold. It was the coldest thing he had felt in a month.",
+"— There’s a pump, the boy said. In the back. It works. I don’t know how it works, but it does.",
+"The gunslinger got up and went to see it. It stood in the back room of the station, a steel thing out of place among the boards, humming to itself. Something under the floor fed it. An atomic slug, he thought, left by the Old Ones, still burning down there in the dark after all this time, lifting water for no one.",
+{c:"first",opts:[
+ ["Drink first",["He put his mouth under the spout and drank until he choked, and then drank again. When he straightened the boy was watching with his hands in his pockets, waiting his turn, as if there were turns."],{khef:-1}],
+ ["Let the boy drink first",["He held the dipper out to the boy. The boy looked at it and at him, and then took it and drank, not much, politely, and gave it back. It was a small thing. The gunslinger did not know why he had done it."],{khef:1}]
+]},
+{w:100,set:true},
+{c:"name",opts:[
+ ["Ask his name",["— What’s your name? he said.","— Jake. The boy said it the way a boy says his name to a teacher."]],
+ ["Wait for it",["He said nothing, and after a while the boy said: I’m Jake. As if silence were a question, and he had been raised to answer questions."]]
+]},
+"— There was a man, Jake said. Before you. A man in black. He went by in the night. I saw him from in there. He didn’t drink. He didn’t stop. I hid till he was gone.",
+"— Did he see you?",
+"Jake looked at the floor. — I don’t know. I think so. I think he knew I was there."
+]},
+{id:"2.4",title:"The Bullet on the Knuckles",kind:"road",art:"knuckles",amb:"none",items:[
+"— How did you come here? the gunslinger asked.",
+"— I don’t know.",
+"— Do you remember?",
+"The boy’s face closed. — I don’t want to.",
+"The gunslinger took a cartridge from his belt and set it on the back of his hand and let it walk: over one knuckle and the next and the next, and under, and back. He had learned it from Cort, who had learned it from someone who was dust. The boy’s eyes went to the brass and stayed there.",
+"— Watch it, the gunslinger said. Only watch. That’s all you have to do.",
+{c:"hyp",opts:[
+ ["Let it run",["He let it run. The boy’s shoulders came down. His mouth opened a little. His eyes followed the brass over and under, over and under, and then they were not following anything."]],
+ ["Almost stop",["He almost stopped. He had a feeling that he should not be doing this to a child, a feeling from a long way back, from a room with his mother in it. He did not stop. The boy’s eyes went still."]]
+]},
+{j:"I was going to school. I had my bookbag and my lunch. My mother was asleep, she always is when I go, and my father was already at work, he’s always already at work. The doorman said have a good day and I said you too."},
+{j:"I was at the corner waiting for the light. There were a lot of people."},
+{j:"Somebody pushed me."},
+{j:"I felt the hand. Right in the middle of my back. And I went out in the street and there was a car, a big one, and a man in a hat inside it with his mouth open, and I heard my lunch go. The bag. I heard it break."},
+{j:"There was a man on the corner. After. I could see him from where I was lying. He was dressed in black, like a priest, and he was looking at me, and he was making a face like he was sorry. But he wasn’t."},
+{j:"Then I was here."},
+"The gunslinger closed his hand over the cartridge. The boy blinked and was only a boy again. He did not remember what he had said, and the gunslinger did not tell him."
+]},
+{id:"2.5",title:"First Light",kind:"road",art:"stationnight",amb:"none",items:[
+"That night the gunslinger sat up with a candle end he had found in the stable and thought about the boy.",
+"The man in black had left him here. Laid neat, for inspection. The gunslinger knew it the way he knew the weight of his guns.",
+"He did not need to kill the man in black. Not first. He needed him to talk. There were things the man in black knew, about the Tower and what stood between, and the gunslinger meant to have them out of him one at a time if he had to.",
+"The boy was asleep in the corner under the gunslinger’s coat.",
+{c:"come",opts:[
+ ["Tell him he’s coming",["In the morning he said: We leave at first light. You’re coming. The boy nodded. He had not expected to be asked."],{khef:-1}],
+ ["Ask him to come",["In the morning he said: I’m going on, after him. You can stay here with the pump, or you can come. The boy looked at the pump, and at the desert, and at him.","— I’ll come, he said."],{khef:1}]
+]}
+]},
+{id:"2.6",title:"The Cellar",kind:"road",art:"cellar",amb:"drip",sigil:"CR-5",items:[
+"Before they left he went down into the cellar to see what the station had to give.",
+"It was a root cellar cut into the ground under the back room, cool, smelling of earth. There were shelves with a few cans gone to rust, and a sack of something that had been meal once. He took what could be taken.",
+"At the back the wall had cracked. Sand came through the crack in a thin steady stream, pouring and pouring, as if the desert were leaking in by the spoonful.",
+"He heard a voice.",
+"It came out of the crack with the sand. It was a woman’s voice, and he knew it. It was Allie’s.",
+{v:"Mind the Drawers, gunslinger. Go slowly when you pass them."},
+{v:"And hear this. You have the boy with you now. As long as you keep him, your soul rides in the man in black’s pocket, and he keeps his hand on it."},
+{c:"voice",opts:[
+ ["Answer the voice",["— Allie? he said.","The sand poured. The voice did not answer to that name or any name. It had said what it had been left there to say."]],
+ ["Say nothing",["He said nothing. You do not answer a thing that speaks out of a wall. He had known that since he was a boy."]]
+]},
+"When it had stopped he put his hand into the crack. The sand ran over his fingers, cool, and behind it there was something hard, and he closed his hand on it and drew it out.",
+"A jawbone. Old and yellow, with some of the teeth still in it. Whatever had spoken had spoken with this, or through it, or had only been waiting in the wall beside it.",
+"Cort used to say a thing about prophecy: that the living lie about it, and only the bones don’t. He put the jawbone in his pocket.",
+{jaw:true},
+"Up in the light, the boy asked what was down there.",
+"— Nothing, the gunslinger said. Cans."
+]},
+{id:"2.7",title:"The Hawk and the Cook",kind:"memory",art:"yard",amb:"wind",items:[
+"They walked toward the mountains, which had come up out of the haze overnight, blue and far. The boy asked where he was from. The gunslinger found that he was telling him.",
+"Gilead. The yard behind the great hall, its stone flags worn hollow by boys’ feet. Cort in the middle of it with his staff: Cort who had taught the gunslinger’s father, and whose face was a map of every lesson he had ever given with his hands.",
+"There was a hawk. Its name was David. Cort gave it to the boy the gunslinger had been and said: You will train him, or he will train you, and I will know which.",
+"His friend Cuthbert trained a hawk too, badly, and laughed about it, and the hawk bit him, and he laughed about that.",
+{c:"hawk",opts:[
+ ["Tell the whole of it",["He told the boy about the hawk. How it came to the glove. How it hated him, and how he did not mind, because it was not a thing that was for liking. The boy listened with his whole face."]],
+ ["Tell the short of it",["— There was a hawk, he said. I trained it. And he left the rest where it was."]]
+]},
+"One night he and Cuthbert went where boys should not go, down under the great hall, along the passages by the kitchens, and heard voices.",
+"The cook was talking to a guard. The cook’s name was Hax. He was a big soft man with a big soft laugh who gave the boys sweets from his kitchen, and he was talking about poison.",
+"There was a town called Farson. There was meat to be sent there, and the meat would have something in it. It was for the good man, Hax said, and the good man would remember who had helped him, when the good man came.",
+"The boys went back up the passage without a sound. On the stairs Cuthbert was not laughing.",
+{c:"father",opts:[
+ ["Tell his father",["He went to his father. He stood in his father’s room with his hands at his sides and told him everything, in order, the way Cort had taught him to report. His father listened without a word. Then he said: Thank you. It was the only time he ever said it."]],
+ ["Keep it",["He meant to keep it. He lay awake a whole night deciding to keep it. In the morning he went to his father and told him everything, in order, the way Cort had taught him. There had never been any keeping it."]]
+]}
+]},
+{id:"2.8",title:"Gallows Hill",kind:"memory",art:"gallows",amb:"wind",sigil:"CR-6",items:[
+"They hanged Hax on Gallows Hill on a day with a hard wind.",
+"Half of Gilead came out to see it. The boys stood at the front. It was thought right that they should see what their telling had made.",
+"Hax came up the steps in a white shirt. He did not look at anyone. The hangman put a black cloth over his eyes, and then the rope. There were ravens on the beam.",
+"Then there was the sound, and then there was not any sound, and Hax turned a little on the rope in the wind.",
+"Afterward, by the old custom, bread was broken under the gallows and scattered for the birds, and each of the boys took a splinter from the gallows beam. The gunslinger kept his a long time. He did not know what had become of it.",
+{c:"bread",opts:[
+ ["Share bread with Cuthbert",["Cuthbert broke a heel of the bread in two and gave him half. They ate it standing there. It was the worst bread in the world."]],
+ ["Walk off alone",["He walked away from the others and stood on the hill with his back to the gallows until the ravens came down."]]
+]}
+]},
+{id:"2.9",title:"A Speck on the Slope",kind:"road",art:"slope",amb:"wind",items:[
+"When he stopped talking the sun was going down behind them and the mountains ahead had gone the colour of a bruise.",
+"The boy had been quiet a long time.",
+"— Did you feel bad? he said. About the cook?",
+"The gunslinger thought about it. — No, he said. He meant it. It was not the answer the boy wanted, and it was still the answer.",
+"Then he saw it. Far up the first long slope of the foothills, above the last of the light, a mark. A speck. Moving. Climbing.",
+{c:"point",opts:[
+ ["Point him out to Jake",["— There, he said. The boy looked where he pointed and saw it too, and the gunslinger watched his face and saw what went across it."],{khef:-1}],
+ ["Say nothing",["He said nothing. Let the boy sleep tonight. The speck went on up the mountain and the gunslinger watched it until it was gone."],{khef:1}]
+]},
+"They were close now. For the first time in all the long months of it, they were close.",
+{end:2}
+]},
+
+/* ===== CHAPTER THREE — THE ORACLE AND THE MOUNTAINS ===== */
+{id:"3.1",title:"Green",kind:"road",art:"green",amb:"birds",items:[
+"The land changed. It changed in a day, the way a face changes when someone it loves walks into the room. Grass. Real grass, green and soft, and water moving through it, and willows along the water with their long hair down.",
+"The boy walked through it touching things.",
+"A rabbit sat up in the grass thirty paces off.",
+{c:"rabbit",opts:[
+ ["Shoot it",["The gunslinger drew."]],
+ ["Offer Jake the gun",["He held out the gun to the boy, butt first. The boy looked at it a long moment and shook his head. The gunslinger drew."]]
+]},
+{draw:"rabbit"},
+"The rabbit went over in the grass. They ate it that night with the fat running down their chins.",
+"In the morning a mantis came down out of the willows and landed on Jake’s head and sat there, green on black, with its hands folded.",
+"Jake held very still. — Is it on me? Is it still on me?",
+{c:"laugh",opts:[
+ ["Laugh",["The gunslinger opened his mouth to laugh and found he did not remember how. Something came out, a sound, a bark. The boy stared at him. Then the boy laughed, at him, and the mantis flew."]],
+ ["Don’t",["The gunslinger looked at the mantis on the boy’s head. Somewhere there was a laugh for this. He could not remember where he had put it."]]
+]}
+]},
+{id:"3.2",title:"The Ring at Night",kind:"road",art:"ring",amb:"drone",items:[
+"That night the gunslinger woke and the boy was gone.",
+"He was up with the guns out before he knew he was awake. The blanket was thrown back. In the grass there was a path, a line where something had walked through it, going up the rise toward the stones.",
+"There was a ring of standing stones on the rise. They had seen it at sunset and the boy had asked about it, and the gunslinger had said it was old, and that they would not go near it.",
+{c:"go",opts:[
+ ["Go in fast",["He went up the rise running."]],
+ ["Go in slow",["He went up slow, the way you come on a thing that is waiting for you."]]
+]},
+"The boy was inside the ring. He lay on a flat stone in the middle with his arms at his sides and his eyes open, and his face was full of a terrible joy, and he was not breathing right.",
+"The air inside the ring was thick. It pushed back at the gunslinger like water. Something was in there with the boy, something without a shape, and it did not want him.",
+"His hand went into his pocket without his telling it to. It came out with the jawbone.",
+"He held it up. He did not know what he was doing. The thing in the ring knew. It drew back from the bone with a sound like wind going out of a room, and the air let go, and the gunslinger went in and lifted the boy off the stone.",
+{c:"carry",opts:[
+ ["Carry him",["He carried him out in his arms. The boy weighed nothing. The boy weighed everything."]],
+ ["Drag him clear",["He meant to drag him by the collar, quick, like a sack. When it came to it he picked him up and carried him in his arms."]]
+]},
+"Outside the ring the boy began to breathe again, and then to cry, and did not know why."
+]},
+{id:"3.3",title:"Tied",kind:"road",art:"tied",amb:"none",items:[
+"The gunslinger sat with the boy until he slept. Then he sat a while longer, looking at the stones.",
+"There was something in there. Something that had wanted the boy. Things like that knew things. They could be made to say them, if you paid.",
+"He took a length of rope from the pack and tied the boy by the ankle to the trunk of a young willow.",
+{c:"knot",opts:[
+ ["Tie it tight",["He tied it tight. If the thing called again, the boy would not be able to answer."],{khef:-1}],
+ ["Tie it loose",["He tied it loose. The boy would be able to slip it if he woke frightened. The gunslinger found he could not make it tighter."],{khef:1}]
+]},
+"He put the jawbone into the boy’s hands and closed the boy’s fingers over it. The boy half woke.",
+"— If you feel it pulling at you, hold on to this, the gunslinger said. It doesn’t like this.",
+{jaw:false},
+{c:"promise",opts:[
+ ["“I’ll be back by morning.”",["— I’ll be back by morning, he said. The boy nodded and slept. It was the kind of thing you tell a child. It happened to be true."]],
+ ["Tell him nothing more",["He did not say where he was going. The boy did not ask. The boy held the bone."]]
+]},
+"Then he took the little packet from the bottom of his purse, the mescaline, and ate some of it, and waited for it to open him.",
+"When the stars began to breathe, he went up the rise and into the ring."
+]},
+{id:"3.4",title:"The Oracle",kind:"road",art:"oracle",amb:"drone",sigil:"CR-7",items:[
+"Inside the ring the grass was wet, and there was a pool he had not seen from outside, black and still, with the stars in it.",
+"He knelt at the edge. His face looked up at him out of the water, and it was not his face. It was a skull.",
+"Then she was there.",
+"She had no shape. She had every shape. She was warm and she was all around him, and her voice came from inside his own head, the loveliest voice he had ever heard, and it was hungry.",
+{v:"You came for the prophecy. They all come for the prophecy. You know the price?"},
+"He knew the price. He paid it. It was not long, and it was not like anything, and afterward he lay in the wet grass and could not have said which of them had been used.",
+{c:"oracle",opts:[
+ ["Ask about the man in black",[]],
+ ["Ask about the Tower",[]],
+ ["Ask about the boy",[]]
+]},
+{pick:["oracle",[
+ "— The man in black, he said. Where is he? What is he? She laughed. That one? He is only a door. Let me tell you about the doors.",
+ "— The Tower, he said. She sighed, as if it were a name she was tired of. They all ask the Tower. Very well. The Tower is at the end of a count. Let me tell you the count.",
+ "— The boy, he said. She was quiet so long he thought she had gone. Then: You ask about the boy first. How interesting. I will tell you about the boy last."
+]]},
+{v:"Your fate goes by threes, gunslinger. Hear the three."},
+{v:"The first is young, and dark-haired, and stands at the edge of robbing and killing. A demon rides him. The demon’s name is heroin."},
+{v:"The second comes to you on wheels. There is steel in her head and something softer under it, and you will not always know which of them you are speaking to."},
+{v:"The third is death. Only death. Not for you."},
+{v:"The boy takes you to the man in black. The man in black takes you to the three. The three take you to the Tower. That is the road."},
+{k:[
+ {v:"And the boy dies. You knew that before you came. You came anyway. You will go on anyway. I like you, gunslinger. You are very like me."},
+ {v:"And the boy dies, if you go on. You could turn back. Take him back across the desert, find him a pump and a roof, grow old. You won’t. But I will let you hear yourself not do it."}
+]},
+"— Go on, the gunslinger said.",
+"But she had gone, and the pool was only a pool, and the sky over the stones was going grey."
+]},
+{id:"3.5",title:"The Climb",kind:"road",art:"climb",amb:"wind",items:[
+"They went up into the mountains. The grass gave out and the trees gave out, and then there was only rock, grey and red, and a thin cold wind, and the path going up in switchbacks.",
+"On the third day the boy stopped and pointed.",
+"Above them, a long way above, on a ledge where the path turned, a figure stood looking down. A hood. A dark robe moving in the wind.",
+"The gunslinger drew.",
+{draw:"miss"},
+"The shot went up into the rock and came back down the mountain in pieces. The figure had not moved.",
+"Then it laughed. The laugh came down to them thin and clear, and with it a voice, pleasant and carrying, the voice of a man calling to a friend across a street.",
+{v:"Not here, gunslinger. On the other side. We’ll talk there, you and I. Only you and I."},
+"The figure turned and went on up the path and was gone around the rock."
+]},
+{id:"3.6",title:"He Knows",kind:"road",art:"switchback",amb:"wind",items:[
+"That night the boy did not sleep. The gunslinger knew it without looking.",
+"— He said only you, the boy said at last.",
+"— Yes.",
+"— That means me. That means I don’t get there.",
+"The gunslinger did not answer.",
+"— He killed me before, the boy said. In the street. And now you’re going to. Aren’t you.",
+{c:"truth",opts:[
+ ["Tell him the truth",["— I don’t know, the gunslinger said, which was a lie. And then: Maybe. Which was the truth, or near enough that the boy heard the difference."],{khef:1}],
+ ["Lie",["— No, the gunslinger said. The boy looked at him a long time in the dark. He knew. He had known since the ring."],{khef:-1}]
+]},
+"In the morning the boy got up and rolled his blanket and put it on his back and started up the path ahead of him. He did not ask to go back. He did not ask anything.",
+{end:3}
+]},
+
+/* ===== CHAPTER FOUR — THE SLOW MUTANTS ===== */
+{id:"4.1",title:"Into the Dark",kind:"road",art:"tunnel",amb:"drip",items:[
+"The path went into the mountain.",
+"There was a cave mouth, and inside the cave a tunnel, and in the tunnel, laid on old ties sunk in dust, a pair of rails going on into the dark. The Old Ones had made it. The Old Ones had made everything that still worked and everything that didn’t.",
+"After a hundred paces there was no light at all.",
+{c:"hand",opts:[
+ ["Hold the boy’s hand",["He held out his hand in the dark, and after a moment the boy found it."],{khef:1}],
+ ["Let him hold your belt",["— Hold on to my belt, he said, and felt the boy’s fingers hook into it at his back."],{khef:-1}]
+]},
+"They walked on the ties. They counted them, for something to do, and lost count, and started over.",
+"— Tell me something, the boy said. Anything. So it’s not so quiet."
+]},
+{id:"4.2",title:"Sowing Night",kind:"memory",art:"hall",amb:"strings",sigil:"CR-8",items:[
+"When he was eleven there was a dance.",
+"It was Sowing Night, in the spring, and the great hall was hung with candles until it was brighter than day, and the gunslinger, who was not a gunslinger yet, who was not anything yet, crept up the back stair and lay on his belly on the gallery to watch.",
+"His father sat at the high table among the other lords, in black. He did not dance. He never danced.",
+"His mother danced. She was the most beautiful thing in the hall, and he had always known it. She danced with Marten.",
+"Marten was the court’s sorcerer: a thin man in a dark cloak, with a smile that seemed to be listening to something no one else could hear.",
+{c:"watch",opts:[
+ ["Watch his mother",["He watched his mother. She was laughing at something Marten said, with her head back, the way she never laughed in her own rooms, and the candlelight lay on her throat."]],
+ ["Watch Marten",["He watched Marten. Marten’s hand was at the small of his mother’s back. Once, turning, Marten looked up at the gallery, straight at the place where the boy lay, and smiled, and looked away."]]
+]},
+{c:"leave",opts:[
+ ["Leave",["He meant to go. He did not go. He lay there until the candles guttered."]],
+ ["Stay",["He stayed until the candles guttered and the dancers were gone."]]
+]},
+"His father had not moved from the high table the whole night. He had watched too."
+]},
+{id:"4.3",title:"The Handcar",kind:"road",art:"handcar",amb:"rails",items:[
+"On the second day in the dark they found the handcar.",
+"The gunslinger’s foot struck it. He felt it over with his hands: a flat bed on iron wheels, and in the middle a lever like a seesaw, for two, one at each end, to pump up and down.",
+"— What is it? the boy said.",
+"— A way to go faster.",
+{c:"pump",opts:[
+ ["Take the near end",["He took the near end of the lever. The boy took the far one. The gunslinger pushed and the boy was lifted almost off his feet, and laughed, and then they had the rhythm of it."]],
+ ["Give Jake the near end",["He put the boy on the near end and took the far. The boy pushed with his whole weight, and the gunslinger let the lever come up slow so he could feel it, and then they had the rhythm of it."]]
+]},
+"The handcar ran on into the dark with a sound like a heart.",
+"— Tell me about your test, the boy said. How you got to be a gunslinger.",
+"The gunslinger pumped a long time before he answered."
+]},
+{id:"4.4",title:"Full Earth",kind:"memory",art:"door",amb:"none",items:[
+"He was fourteen. It was high summer, Full Earth, the heat lying on Gilead like a hand.",
+"He was going along the corridor past his mother’s rooms when the door opened and Marten came out.",
+"Marten was doing up his shirt. He saw the boy and did not hurry. He finished with the shirt. Behind him, through the door, the boy saw his mother, and on his mother’s neck there was a mark.",
+"Marten smiled. He said things. They were said lightly, and each of them was a hook, and they went into the boy and set. Then Marten walked away down the corridor, whistling.",
+{c:"marten",opts:[
+ ["“You’ll see me again.”",["— You’ll see me again, the boy said to his back.","Marten did not turn. — I’m sure I will, he said."]],
+ ["Say nothing",["The boy said nothing. He stood in the corridor until the whistling was gone. His hands were shaking, and he looked at them until they stopped."]],
+ ["“I know what you are.”",["— I know what you are, the boy said.","Marten turned then and looked at him with real interest. — No, he said. But you will."]]
+]},
+"He went to Cort.",
+{c:"knock",opts:[
+ ["Knock and wait",["He knocked and waited, and when Cort opened he said the words, the old ones, that a boy says when he means to be tested."]],
+ ["Beat on the door",["He beat on Cort’s door with his fist until it opened. Then he said the old words, all of them, too fast."]]
+]},
+"Cort looked at him a long time.",
+"— You are early, Cort said. Years early. If you lose, you go west. You are not a boy of Gilead again, and you do not come back.",
+"— I know it.",
+"— Who sent you to me today?",
+"The boy did not answer. Cort nodded as if he had.",
+"— What weapon?",
+"— David, the boy said."
+]},
+{id:"4.5",title:"The Test",kind:"memory",art:"testyard",amb:"wind",sigil:"CR-9",items:[
+"The yard at noon. The stones white with heat. Old men on the walls to watch.",
+"Cort came out with his staff. The boy came out with the hawk on his fist, hooded.",
+"Cort did not wait. Cort never waited. The staff came around low and the boy was not there, and the staff came around high and the boy was not quite there either, and then the boy pulled the hood.",
+{c:"loose",opts:[
+ ["Loose him high",["He threw the hawk up into the white sky, and it hung there, and turned, and came down."]],
+ ["Loose him low",["He threw the hawk straight at Cort’s face from an arm’s length away."]]
+]},
+{draw:"hawk"},
+"David went for Cort’s face. Cort made a sound the boy had never heard him make. The hawk was on him, the claws in him, and then one of Cort’s eyes was gone.",
+"Then Cort took the hawk in his hand and broke its neck and threw it down.",
+"The boy was on him. Afterward he did not remember much of what he did. He remembered the staff, and getting it, and what he did with it, and Cort going down and getting up and going down.",
+{c:"finish",opts:[
+ ["Finish it",["He raised the staff to finish it. Cort, on his knees, with his face running red, held up one hand. — Enough, he said. The boy stopped. He found he had always been going to stop."]],
+ ["Stop",["He stopped with the staff raised. Cort, on his knees, looked up at him out of his one eye."]]
+]},
+"— The key, Cort said. Take it. It’s yours. And then, softer, so only the boy could hear: Your hawk. You used him well.",
+"He held out the key to the room where the apprentice guns were kept, and smiled with his broken mouth, and fell over on his side and slept."
+]},
+{id:"4.6",title:"The Lower Town",kind:"memory",art:"lowertown",amb:"none",items:[
+"He did not go to his father. He did not go to his mother.",
+"He picked David up off the stones and buried him behind the mews. Then he went down into the lower town, where the lamps were lit early and the doors stood open, and found a woman there, and was a man for the first time in two ways in one day.",
+"He never told his father that. His father would have known."
+]},
+{id:"4.7",title:"Poker Chip",kind:"road",art:"dark",amb:"rails",items:[
+"The handcar ran on.",
+"— You didn’t tell it all, the boy said.",
+"— No.",
+"The boy pumped a while. Then he said: I know what I am. To you.",
+"— What?",
+"— I’m your poker chip.",
+"The gunslinger did not know what a poker chip was. The boy told him. It was a thing you put down on a table to win something bigger. It was a thing you could lose.",
+{c:"chip",opts:[
+ ["Tell him yes",["— Yes, the gunslinger said. It was the truest thing he had said to anyone since Tull, and he said it to a child in the dark."],{khef:-1}],
+ ["Say nothing",["The gunslinger said nothing. The lever went up and down between them. The boy did not ask again."],{khef:1}]
+]}
+]},
+{id:"4.8",title:"Slow Mutants",kind:"road",art:"mutants",amb:"rails",items:[
+"They heard them first.",
+"A shuffling in the dark on both sides of the rails. A wet breathing. Then a light, faint, green, and another, and another, and the gunslinger saw that the lights were faces.",
+"They had been men once. They were not now. They glowed the way rotten wood glows in a swamp, and they came slowly, reaching, and there were a great many of them.",
+{c:"aim",opts:[
+ ["Shoot the nearest",["He shot the nearest."],{khef:-1}],
+ ["Shoot the ones reaching for Jake",["He shot the ones reaching for the boy first."],{khef:1}]
+]},
+{draw:"mutants"},
+"In the flash of each shot he saw them: a white face with no nose, a hand with too many fingers, a mouth. One had the boy by the leg. The gunslinger shot it and the boy pulled free.",
+{c:"shout",opts:[
+ ["“Pump!”",["— Pump! he shouted, and the boy pumped, and the handcar lurched and gathered and ran, and the hands slid off it behind them."]],
+ ["“Get down!”",["— Down! he shouted, and the boy went flat on the bed, and the gunslinger worked the lever with one arm and fired with the other, and the handcar ran, and the hands slid off it behind them."]]
+]},
+"For a long time afterward they could hear them. Then they could not."
+]},
+{id:"4.9",title:"The Dead Terminal",kind:"road",art:"terminal",amb:"drip",items:[
+"On the third day the tunnel opened into a great room.",
+"There was light here, a little, grey, coming from somewhere far above. The rails ran through the middle of a floor of broken tile. There were signs on the walls in many alphabets, most of which the gunslinger did not know and a few of which the boy did.",
+"People sat on benches along the walls. They had been sitting there a long time. They were dry and brown and light as paper, and their clothes had gone to dust on them, and some of them still held bags in their laps, as if the train were coming.",
+{c:"signs",opts:[
+ ["Read the signs",["The boy read one aloud for him. It said which way to go for which trains, and what not to do, and that there was no smoking. The boy laughed at that until he stopped."]],
+ ["Pass them by",["He did not look at the signs. Signs were for people going somewhere they could come back from."]]
+]},
+"At the far edge of the room the boy stopped.",
+"— I don’t want to go on, he said. I don’t want to.",
+{c:"wait",opts:[
+ ["Wait for him",["The gunslinger waited. He did not say anything. After a while the boy came on."],{khef:1}],
+ ["Walk on",["The gunslinger walked on. After a moment he heard the boy’s feet coming after him on the tile."],{khef:-1}]
+]}
+]},
+{id:"4.10",title:"The Trestle",kind:"road",art:"trestle",amb:"river",sigil:"CR-10",items:[
+"Past the terminal the tunnel ran on, and then there was a sound of water far below, and a smell of air, and light ahead.",
+"The rails went out over a chasm on a trestle of old wood. The wood had rotted. Some of the ties were gone. Far down a river roared in the dark, and far ahead, at the end of the trestle, there was daylight.",
+"They left the handcar and went out onto the trestle on foot.",
+"At the far end, in the light, with his hood up, the man in black was waiting.",
+"— Come on, gunslinger, he called. Come on. The door’s open. Bring the boy, if you like.",
+"The boy stepped on a tie, and the tie was not there.",
+{drop:true},
+{k:[
+ "The gunslinger did not look down. He got up and went on across the trestle toward the light. When he came out into it the man in black was gone on ahead, and the prints went on.",
+ "The gunslinger looked down. There was nothing to see: the dark, and the sound of the river. He looked a long time. Then he got up and went on across toward the light, and the man in black was gone on ahead, and the prints went on."
+]},
+{end:4}
+]},
+
+/* ===== CHAPTER FIVE — THE GUNSLINGER AND THE DARK MAN ===== */
+{id:"5.1",title:"The Golgotha",kind:"road",art:"golgotha",amb:"wind",items:[
+"On the far side of the mountains the gunslinger came down into a place of bones.",
+"It was a round hollow among the rocks, like the inside of a bowl, and the floor of it was white. Bones. Old ones, older than Tull, older than Gilead, bones of things he knew and things he did not, piled and scattered and drifted like snow. A place of the skull.",
+"In the middle of it, on a rock, sat the man in black.",
+"— Gunslinger, he said. Good evening. Sit. You’ve come a long way, and you’ve paid your fare, and there is a great deal to talk about.",
+{c:"sit5",opts:[
+ ["Sit across from him",["The gunslinger sat down across from him. It was the first time in all the long chase that they had been near enough to touch."]],
+ ["Stand",["The gunslinger stood. The man in black shrugged, courteously, as if a guest had declined a chair."]]
+]},
+{c:"gun5",opts:[
+ ["Keep the gun drawn",["He kept the gun in his hand. The man in black glanced at it the way a man glances at weather."]],
+ ["Holster it",["He put the gun away. It had been no use on the mountain and it would be no use here, and they both knew it."]]
+]},
+"— Wood, the man in black said. Would you fetch us some wood? It gets cold here at night. It’s the altitude."
+]},
+{id:"5.2",title:"The Rabbit",kind:"road",art:"golgothafire",amb:"fire",items:[
+"The gunslinger gathered wood among the bones. When he came back the man in black passed a hand over it, and it caught, and burned with a clean blue flame that smelled of some sweet resin.",
+"There was a rabbit on a spit. The gunslinger had not seen it arrive. It was done, brown and dripping.",
+"— Eat, the man in black said.",
+{c:"eat",opts:[
+ ["“I’ll eat my own.”",["— I’ll eat my own, the gunslinger said, and took jerky from his purse and ate it. The man in black ate the rabbit delicately, with his fingers, and licked them."]],
+ ["“What’s in it?”",["— What’s in it?","— Rabbit, said the man in black, hurt.","The gunslinger ate his jerky. The man in black ate the rabbit."]],
+ ["Say nothing",["The gunslinger took jerky from his purse and ate it. The man in black ate the rabbit himself, and did not seem to mind, and did not seem surprised."]]
+]},
+"Then the man in black put back his hood.",
+"He was handsome. That was the strangest thing. The gunslinger had expected something, a ruin, a horror, and it was only a man, dark-haired and shaggy, with a pleasant face that might have been any age, and very merry eyes.",
+"— I am nearly immortal, he said, as if he had been asked. It is less pleasant than you would think. You won’t see the sun come up for a long while, gunslinger. Shall we begin?"
+]},
+{id:"5.3",title:"Seven Cards",kind:"road",art:"golgothafire",amb:"fire",sigil:"CR-11",items:[
+"He took out a pack of cards. They were old and soft and larger than any cards the gunslinger had seen, and he shuffled them with long fingers.",
+"— Your fortune, he said. Truly. I’ve looked forward to this.",
+{tarot:true},
+"— That’s all, the man in black said, dusting his hands. The rest you’ll have to find out the ordinary way."
+]},
+{id:"5.4",title:"Let There Be",kind:"road",art:"black",amb:"none",items:[
+"The gunslinger came up off the ground at him.",
+"The man in black said a word.",
+{vision:true},
+"He came back to himself on his face among the bones, with the fire burning low and the man in black sitting where he had sat, watching him. There was no merriment in his eyes now at all."
+]},
+{id:"5.5",title:"Palaver",kind:"road",art:"embers",amb:"fire",sigil:"CR-12",items:[
+"They talked. The night went on and on, and they talked through all of it.",
+"— Your name, the gunslinger said.",
+"— Walter, said the man in black. It’s as good as any.",
+{c:"askfirst",opts:[
+ ["Ask about Marten",["— Marten, the gunslinger said.","— Ah. Marten. My master. You thought I was the one who went to your mother? No. I only held the door. I am Marten’s creature, gunslinger, and have been since before you were weaned."]],
+ ["Ask who he serves",["— Who do you serve?","— Marten, first. And Marten serves another. You haven’t heard of him. The Ageless Stranger, they call him, in the places where they call him anything. His name is Maerlyn."]],
+ ["Ask what stands at the top",["— What stands at the top of it?","— Not at the top. Below the top. The Beast. The keeper of the Tower. I have never seen it. Maerlyn has. He doesn’t speak of it."]],
+ ["Ask about the Tower",["— The Tower, the gunslinger said.","— Always the Tower. Very well. It stands at the center of everything, gunslinger. Every world. Every when. It is the nail they all hang on."]]
+]},
+"The man in black laid out the order of it then, patiently, as a tutor gives a slow boy his letters. He, Walter, served Marten. Marten served the Ageless Stranger, who was Maerlyn. The Stranger served the Beast, and the Beast kept the Tower, and what waited in the Tower, at the top of the stair, in the room at the top, no one knew.",
+"— You’ll have to kill the Beast, the man in black said. And before the Beast, the Stranger. And before him, well. You’re good at that part.",
+"He talked about size. About how the world was only a grain in something larger, and that a grain in something larger again, and on, up and down, without end. The gunslinger understood perhaps a tenth of it and remembered all of it.",
+"Toward what should have been morning, the gunslinger asked the question he had carried the longest.",
+"— Do I reach it? he said. At the end of all this. Do I win?",
+"The man in black looked at him a long time. Then he laughed, not unkindly.",
+"— Ask me something I know, he said."
+]},
+{id:"5.6",title:"West",kind:"road",art:"embersdie",amb:"fire",items:[
+"— Go west, the man in black said. Twenty miles, no more. You’ll come to the sea. Sit down there and wait. You’ll be given the drawing. Three will come to you, and you’ll draw them, the way you draw a gun.",
+"— And you?",
+"— I’ll be here. Resting.",
+"The fire was very low. The gunslinger found he could not keep his eyes open. He tried. The man in black watched him try, smiling.",
+"— Sleep, gunslinger, he said. Let there be light."
+]},
+{id:"5.7",title:"Ten Years",kind:"road",art:"bones",amb:"wind",sigil:"CR-13",items:[
+"He woke cold.",
+"The fire was ash, and the ash was old, crusted over like the desert’s crust. The light was grey. It was morning, or it was some morning.",
+"He sat up, and his body told him it had been lying there a long time. His hands were an old man’s hands. His hair, when he pulled it forward, was grey. Ten years, he thought. He did not know how he knew it. Ten years, and he had not died of them.",
+"Across the dead fire, where the man in black had sat, there was a skeleton.",
+"It lay on its back in the rags of a black robe, and the robe had rotted, and the bones had gone the colour of all the other bones in that place. It had been a long time dead. It had been Walter.",
+"The gunslinger looked at it for a while. He did not doubt it. He had come too far to doubt it.",
+{c:"jaw5",opts:[
+ ["Take the jawbone",["He knelt and broke the jawbone from the skull, carefully, the way you break a stick for kindling, and put it in his pocket."]],
+ ["Leave the bones whole",["He meant to leave them whole. Then he knelt and broke the jawbone from the skull after all, and put it in his pocket."]]
+]},
+{jaw:true}
+]},
+{id:"5.8",title:"The Western Sea",kind:"road",art:"sea",amb:"sea",sigil:"CR-14",items:[
+"He walked west.",
+"The land went down in long steps of rock and then sand, and there was a sound he had never heard and a smell he had never smelled, and then he came over the last rise and it was there.",
+"The sea. Grey-green and enormous under a low sun, coming in and going out, coming in and going out, as if the world were breathing.",
+"He went down to the edge of it and sat in the sand with the guns across his knees and his hat pulled low, and watched the sun go down into the water.",
+"He thought of the boy. He let himself. It was the first time.",
+"Then he thought of nothing. The sun went down, and the light went lavender and then grey, and somewhere out over the water, or in his head, he saw it.",
+"The Tower. Far and faint and dark against the last of the sky, standing up out of the clouds, the way it stood in the dreams he had never told anyone.",
+"He sat on the shore and dreamed of it while the light went. The drawing would come. The three would come. He would wait.",
+{end:5}
+]}
+
+];
+
+/* ---------- state ---------- */
+let st=fresh();
+function fresh(){return{scene:0,flags:{},water:60,khef:0,jaw:false,cr:false,done:{},sound:true}}
+let step=0, busy=false, sceneStart=null;
+const $=id=>document.getElementById(id);
+const inner=$("inner"), textEl=$("text");
+
+/* ---------- audio ---------- */
+const A={ctx:null,amb:null,ambName:"",
+ init(){if(this.ctx)return;try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();this.master=this.ctx.createGain();this.master.gain.value=st.sound?.55:0;this.master.connect(this.ctx.destination);const n=this.ctx.sampleRate*2,b=this.ctx.createBuffer(1,n,this.ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;this.noise=b}catch(e){this.ctx=null}},
+ mute(on){if(this.master)this.master.gain.setTargetAtTime(on?.55:0,this.ctx.currentTime,.1)},
+ src(){const s=this.ctx.createBufferSource();s.buffer=this.noise;s.loop=true;return s},
+ stopAmb(){if(!this.amb)return;const a=this.amb;this.amb=null;try{a.g.gain.setTargetAtTime(0,this.ctx.currentTime,.5);setTimeout(()=>{a.stop()},1800)}catch(e){}},
+ play(name){if(!this.ctx||name===this.ambName)return;this.ambName=name;this.stopAmb();if(name==="none")return;
+  const c=this.ctx,g=c.createGain();g.gain.value=0;g.connect(this.master);const nodes=[];let timer=null;
+  if(name==="wind"||name==="storm"){const s=this.src(),f=c.createBiquadFilter();f.type="bandpass";f.frequency.value=name==="storm"?700:420;f.Q.value=.7;const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=.09;lg.gain.value=name==="storm"?300:180;lfo.connect(lg);lg.connect(f.frequency);s.connect(f);f.connect(g);s.start();lfo.start();nodes.push(s,lfo);g.gain.setTargetAtTime(name==="storm"?.5:.28,c.currentTime,1.2)}
+  if(name==="fire"){const s=this.src(),f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=380;s.connect(f);f.connect(g);s.start();nodes.push(s);g.gain.setTargetAtTime(.12,c.currentTime,1);
+   timer=setInterval(()=>{if(Math.random()<.55)this.pop(.05+Math.random()*.08)},230)}
+  if(name==="piano"){const s=this.src(),f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=300;s.connect(f);f.connect(g);s.start();nodes.push(s);g.gain.setTargetAtTime(.05,c.currentTime,1);
+   const notes=[196,220,247,262,294,330,349,392,440];timer=setInterval(()=>{if(Math.random()<.6)this.key(notes[Math.floor(Math.random()*notes.length)]*(Math.random()<.3?.5:1))},420)}
+  this.amb={g,stop:()=>{nodes.forEach(n=>{try{n.stop()}catch(e){}});if(timer)clearInterval(timer)}}},
+ pop(v){const c=this.ctx,s=c.createBufferSource();s.buffer=this.noise;const f=c.createBiquadFilter();f.type="highpass";f.frequency.value=1500;const g=c.createGain();g.gain.value=v;g.gain.setTargetAtTime(0,c.currentTime+.01,.02);s.connect(f);f.connect(g);g.connect(this.master);s.start(0,Math.random()*1.5,.12)},
+ key(fr){const c=this.ctx,o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain();o.type="triangle";o.frequency.value=fr;f.type="lowpass";f.frequency.value=700;g.gain.value=0;g.gain.setTargetAtTime(.09,c.currentTime,.005);g.gain.setTargetAtTime(0,c.currentTime+.08,.35);o.connect(f);f.connect(g);g.connect(this.master);o.start();o.stop(c.currentTime+1.6)},
+ shot(){if(!this.ctx)return;const c=this.ctx,t=c.currentTime,s=c.createBufferSource();s.buffer=this.noise;const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=2400;const g=c.createGain();g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);s.connect(f);f.connect(g);g.connect(this.master);s.start(t,Math.random(),.4);
+  const o=c.createOscillator(),og=c.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.2);og.gain.setValueAtTime(.7,t);og.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(og);og.connect(this.master);o.start(t);o.stop(t+.3)},
+ click(){if(!this.ctx)return;this.pop(.25)}
+};
+
+/* ---------- art (original, drawn in code) ---------- */
+const W=500,H=300;
+function fig(x,y,s,c){c=c||"#1E1712";return`<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><ellipse cx="0" cy="-27" rx="7" ry="1.6"/><rect x="-3.2" y="-31" width="6.4" height="4" rx="1"/><circle cx="0" cy="-24" r="2.6"/><path d="M-4.5 -21 L4.5 -21 L5.5 -8 L3 -8 L2.4 0 L0.6 0 L0 -7 L-0.6 0 L-2.4 0 L-3 -8 L-5.5 -8 Z"/></g>`}
+function mule(x,y,s){return`<g transform="translate(${x} ${y}) scale(${s})" fill="#1E1712"><path d="M-14 -14 Q-2 -17 10 -14 L14 -20 L16 -19 L15 -12 L12 -9 L12 0 L10 0 L9 -8 L-8 -8 L-9 0 L-11 0 L-12 -8 Q-15 -10 -14 -14Z"/><path d="M14 -20 l-1 -4 l2 3 z"/></g>`}
+function grad(id,stops){return`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">${stops.map((c,i)=>`<stop offset="${(i/(stops.length-1)).toFixed(2)}" stop-color="${c}"/>`).join("")}</linearGradient>`}
+function grain(){return`<filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .07  0 0 0 0 .05  0 0 0 .5 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>`}
+function svg(defs,body){return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs>${grain()}${defs}</defs>${body}<rect width="${W}" height="${H}" filter="url(#gr)" opacity=".55"/></svg>`}
+function land(y1,y2,top,bot){return`<path d="M0 ${y1} L${W} ${y2} L${W} ${H} L0 ${H}Z" fill="url(#${top})"/>`}
+const ART={
+ title(){return svg(grad("sk",["#E8DCC4","#EFE2C6","#D9B878"])+grad("gd",["#C9A96E","#8A6A35"]),`<rect width="500" height="300" fill="url(#sk)"/><circle cx="380" cy="60" r="18" fill="#F7EEDA"/>${land(196,190,"gd")}<path d="M0 196 L500 190" stroke="#B8912F" stroke-width="1.2"/><g class="speck">${fig(250,191,.32,"#2B2019")}</g>`)},
+ desert(){return svg(grad("sk",["#F3EBDA","#E8DCC4","#DCC79C"])+grad("gd",["#E0CFA8","#B89A62"]),`<rect width="500" height="300" fill="url(#sk)"/><circle cx="250" cy="34" r="14" fill="#FFF8EA"/>${land(170,162,"gd")}${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<ellipse cx="${210+i*9-i*i*.6}" cy="${290-i*10}" rx="${3.2-i*.18}" ry="${1.4-i*.07}" fill="#8A6A35" opacity=".6"/>`).join("")}${[60,120,420,470,330].map((x,i)=>`<ellipse cx="${x}" cy="${178+i*14}" rx="${16+i*3}" ry="5" fill="#7C8AA0" opacity=".45"/>`).join("")}<ellipse cx="300" cy="232" rx="14" ry="4" fill="#9A9082" opacity=".8"/>${fig(160,214,.9)}${mule(122,214,.9)}`)},
+ hut(){return svg(grad("sk",["#E9A07A","#F4B58A","#F1D1A6"])+grad("gd",["#D8B77F","#A9844B"]),`<rect width="500" height="300" fill="url(#sk)"/><circle cx="410" cy="150" r="22" fill="#F2622A" opacity=".9"/><path d="M0 200 Q120 150 230 190 T500 180 L500 300 L0 300Z" fill="url(#gd)"/><path d="M0 240 Q160 200 300 236 T500 226 L500 300 L0 300Z" fill="#B8935A"/><rect x="250" y="178" width="70" height="30" fill="#5A3F28"/><path d="M244 180 L326 180 L318 168 L252 168Z" fill="#3A2A1C"/><rect x="278" y="190" width="12" height="18" fill="#1E1712"/>${[0,1,2,3,4,5].map(i=>`<path d="M${150+i*14} 214 l0 -${16+i%2*6}" stroke="#8A6A35" stroke-width="2"/>`).join("")}<path d="M360 204 L360 170 M340 160 L395 185" stroke="#3A2A1C" stroke-width="2.4"/>${fig(210,232,.9)}`)},
+ interior(){return svg(`<radialGradient id="lp" cx=".45" cy=".45" r=".6"><stop offset="0" stop-color="#B8912F" stop-opacity=".75"/><stop offset=".5" stop-color="#5A3A1E" stop-opacity=".5"/><stop offset="1" stop-color="#1E1712" stop-opacity="1"/></radialGradient>`,`<rect width="500" height="300" fill="#1E1712"/><rect width="500" height="300" fill="url(#lp)"/><rect x="380" y="60" width="70" height="140" fill="#11172A"/><circle cx="420" cy="90" r="1.2" fill="#E8DCC4"/><circle cx="400" cy="120" r=".9" fill="#E8DCC4"/><path d="M372 68 l14 -3 l3 4 l-4 3z" fill="#0c0906"/><rect x="120" y="190" width="220" height="10" fill="#3A2A1C"/><circle cx="220" cy="140" r="7" fill="#F4B58A"/><path d="M216 150 h8 l2 10 h-12z" fill="#5A3F28"/><path d="M60 300 L60 180 Q70 150 90 180 L96 300Z" fill="#0f0b08"/><path d="M430 300 L424 190 Q412 160 402 190 L400 300Z" fill="#0f0b08"/>`)},
+ embers(){return svg(`<radialGradient id="em" cx=".5" cy=".7" r=".5"><stop offset="0" stop-color="#F2622A" stop-opacity=".7"/><stop offset=".4" stop-color="#7A1E1E" stop-opacity=".35"/><stop offset="1" stop-color="#120d0a" stop-opacity="1"/></radialGradient>`,`<rect width="500" height="300" fill="#120d0a"/><rect width="500" height="300" fill="url(#em)"/><ellipse cx="250" cy="226" rx="26" ry="6" fill="#F2622A" opacity=".85"/><ellipse cx="250" cy="224" rx="12" ry="3" fill="#FFD9A0"/>${fig(186,236,1.3,"#0a0706")}<g transform="translate(314 236) scale(1.3)" fill="#0a0706"><path d="M-6 0 L-7 -16 Q0 -26 7 -16 L6 0Z"/><circle cx="0" cy="-22" r="3.6"/><path d="M-2 -30 L-1 -27 L2 -27 L4 -31 L1 -30Z"/></g>`)},
+ street(){return svg(grad("sk",["#6A3A2A","#C0643A","#F2622A","#F4B58A"])+grad("gd",["#8A4B22","#4A2A18"]),`<rect width="500" height="300" fill="url(#sk)"/>${land(200,196,"gd")}${[[20,120,60],[82,140,44],[128,110,58],[330,120,54],[386,100,62],[450,136,50]].map(b=>`<rect x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${200-b[1]}" fill="#2A1A12"/>`).join("")}<rect x="146" y="150" width="20" height="16" fill="#F2B24A"/><rect x="170" y="150" width="14" height="16" fill="#F2B24A" opacity=".7"/><path d="M240 196 L240 150 L262 136 L284 150 L284 196Z" fill="#2A1A12"/><path d="M262 136 l0 -18 M256 124 h12" stroke="#2A1A12" stroke-width="2.4"/>${mule(208,212,.7)}${fig(224,212,.7,"#140d09")}<path d="M160 300 L240 200 L270 200 L360 300Z" fill="#9A5A2A" opacity=".35"/>`)},
+ lamp(){return svg(`<radialGradient id="lp" cx=".3" cy=".4" r=".7"><stop offset="0" stop-color="#F2B24A" stop-opacity=".8"/><stop offset=".35" stop-color="#8A4B22" stop-opacity=".45"/><stop offset="1" stop-color="#140e0a"/></radialGradient>`,`<rect width="500" height="300" fill="#140e0a"/><rect width="500" height="300" fill="url(#lp)"/><path d="M300 0 Q330 150 310 300 L380 300 Q400 140 360 0Z" fill="#5A2A1E" opacity=".8"/><path d="M320 0 Q346 150 330 300" stroke="#7A3A26" stroke-width="3" fill="none"/><rect x="130" y="126" width="12" height="22" rx="3" fill="#E8DCC4" opacity=".85"/><ellipse cx="136" cy="118" rx="5" ry="9" fill="#FFE1A0"/><path d="M40 300 Q160 210 280 250 L300 300Z" fill="#2A1C14"/><path d="M60 290 Q170 226 270 262" stroke="#4A3524" stroke-width="2" fill="none"/>`)},
+ barn(){return svg(grad("sk",["#B8912F","#C9A96E","#8A6A35"]),`<rect width="500" height="300" fill="#2A1C12"/><rect x="170" y="30" width="170" height="240" fill="url(#sk)"/>${[0,1,2,3,4,5,6,7,8].map(i=>`<rect x="${i*22}" y="0" width="18" height="300" fill="#3A2718" opacity="${.9-i*.05}"/><rect x="${352+i*18}" y="0" width="15" height="300" fill="#3A2718" opacity="${.5+i*.05}"/>`).join("")}<path d="M300 270 L300 160 Q308 146 316 160 L318 270Z" fill="#1A120c" opacity=".75"/><path d="M296 176 l40 -30" stroke="#1A120c" stroke-width="7" stroke-linecap="round" opacity=".75"/>${fig(230,262,1.6,"#1A120c")}`)},
+ knife(){return svg("",`<rect width="500" height="300" fill="#0a0706"/><rect x="190" y="20" width="120" height="280" fill="#15100c"/><path d="M300 20 L310 300" stroke="#3A2A1C" stroke-width="3"/><path d="M226 178 L278 150" stroke="#E8DCC4" stroke-width="2.2" stroke-linecap="round"/><path d="M262 159 L278 150" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".9"/>`)},
+ church(){return svg("",`<rect width="500" height="300" fill="#110c09"/>${Array.from({length:14},(_,i)=>`<rect x="${14+i*35}" y="0" width="${4+(i%3)}" height="300" fill="#F4E3B6" opacity="${.18+((i*7)%5)*.05}"/>`).join("")}<path d="M180 300 L186 70 Q250 30 314 70 L320 300Z" fill="#050403"/><rect x="200" y="150" width="100" height="40" fill="#1A120c"/>${Array.from({length:5},(_,r)=>`<rect x="20" y="${210+r*18}" width="460" height="6" fill="#241911"/>`).join("")}${Array.from({length:22},(_,i)=>`<circle cx="${30+i*21}" cy="${205+(i%5)*18}" r="5" fill="#0b0806"/>`).join("")}`)},
+ slit(){return svg("",`<rect width="500" height="300" fill="#060403"/><rect x="236" y="0" width="28" height="160" fill="#0d0907"/><rect x="249" y="30" width="3" height="100" fill="#F2B24A"/><path d="M250 160 L220 300 L290 300Z" fill="#F2B24A" opacity=".2"/><path d="M251 160 L246 300" stroke="#F2B24A" stroke-width="3" opacity=".75"/>`)},
+ storm(){return svg(grad("sk",["#6B5638","#9C8052","#7A6440"]),`<rect width="500" height="300" fill="url(#sk)"/><g class="streaks">${Array.from({length:40},(_,i)=>`<rect x="${(i*53)%500}" y="${(i*37)%300}" width="${60+(i*13)%80}" height="1.4" fill="#E8DCC4" opacity="${.1+(i%4)*.06}"/>`).join("")}</g><rect x="60" y="80" width="160" height="220" fill="#2A1C12"/><rect x="120" y="150" width="46" height="150" fill="#6B5638" class="doorflap"/>${mule(330,256,1.6)}${fig(370,256,1.6,"#1A120c")}`)},
+ canted(){return svg(grad("sk",["#6D5A72","#A997B8","#C9A96E"])+grad("gd",["#B8935A","#6A4A28"]),`<rect width="500" height="300" fill="url(#sk)"/>${land(150,220,"gd")}<path d="M0 150 L500 220" stroke="#4A3524" stroke-width="1.4"/>`)},
+ deadtown(){const pts=[[80,290],[110,276],[150,268],[182,254],[210,246],[240,236],[262,226],[282,218],[300,210],[316,204],[330,198]];return svg(grad("sk",["#8B7A93","#A997B8","#D6BFA0"])+grad("gd",["#C9A96E","#7A5A34"]),`<rect width="500" height="300" fill="url(#sk)"/>${land(160,200,"gd")}${pts.map((p,i)=>`<ellipse cx="${p[0]}" cy="${p[1]}" rx="${16-i*1.1}" ry="${4-i*.25}" fill="#2B2019" transform="rotate(${(i%3-1)*14} ${p[0]} ${p[1]})"/>`).join("")}${[[130,286,30],[250,232,-30]].map(s=>`<path d="M${s[0]} ${s[1]} l24 -8" stroke="#3A2A1C" stroke-width="1.6" transform="rotate(${s[2]} ${s[0]} ${s[1]})"/>`).join("")}${fig(344,192,.62)}<rect x="330" y="96" width="30" height="${192-96-40}" fill="none"/>`)},
+ dawn(){return svg(grad("sk",["#E9C9A8","#F4B58A","#F3E4CC"])+grad("gd",["#D8BE8C","#B0905A"]),`<rect width="500" height="300" fill="url(#sk)"/><circle cx="90" cy="176" r="20" fill="#F2622A" opacity=".85"/><path d="M0 190 Q140 150 260 180 T500 170 L500 300 L0 300Z" fill="url(#gd)"/><rect x="120" y="170" width="24" height="12" fill="#5A3F28"/><path d="M118 171 l30 0 l-3 -5 l-24 0z" fill="#3A2A1C"/>${fig(152,196,.4)}${fig(390,236,.9)}<path d="M400 238 L500 250" stroke="#8A6A35" stroke-width=".8" stroke-dasharray="2 5"/>`)},
+ dream(){return svg(`<radialGradient id="dm" cx=".5" cy=".55" r=".55"><stop offset="0" stop-color="#4A3A2C"/><stop offset="1" stop-color="#0c0806"/></radialGradient>`,`<rect width="500" height="300" fill="url(#dm)"/>${Array.from({length:6},(_,r)=>Array.from({length:10},(_,c)=>`<rect x="${c*52+(r%2)*26-10}" y="${170+r*22}" width="48" height="18" fill="#2A2019" opacity="${.9-r*.1}"/>`).join("")).join("")}<path d="M300 176 L304 60" stroke="#1a130e" stroke-width="3"/>${fig(300,176,1.4,"#120d0a")}${fig(236,190,.9,"#120d0a")}<rect x="220" y="186" width="30" height="6" fill="#2A2019"/>`)}
+};
+let artKey="";
+function setArt(k){if(k===artKey)return;artKey=k;const host=$("art");const old=host.querySelector(".layer");const d=document.createElement("div");d.className="layer fade";d.style.cssText="position:absolute;inset:0;opacity:0";d.innerHTML=ART[k]();host.insertBefore(d,$("memTag"));requestAnimationFrame(()=>{d.style.opacity=1});if(old){old.style.opacity=0;setTimeout(()=>old.remove(),950)}animateArt(d,k)}
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function animateArt(d,k){if(RM)return;if(k==="storm"){const g=d.querySelector(".streaks");let x=0;const f=()=>{if(!d.isConnected)return;x=(x+6)%500;g.setAttribute("transform",`translate(${-x} 0)`);requestAnimationFrame(f)};f()}}
+
+/* ---------- added for chapters 2-5 ---------- */
+Object.assign(SIGILS,{
+ "CR-4":"He fell from a corner in New York in 1977. Keep the year.",
+ "CR-5":"The Drawers are a place a woman will carry in her head, and she will name it before he does.",
+ "CR-6":"Three boys from that yard will ride east together one summer. Two of them are in this story. The third has not been named yet.",
+ "CR-7":"The young dark one. The one on wheels. The one who is death. You will meet them through doors that stand on a beach with nothing behind them.",
+ "CR-8":"The man she dances with has other names and other faces. In a dead America he walks the highways. In a kingdom called Delain he keeps a king’s secrets.",
+ "CR-9":"A hawk named David. The Tower keeps a room for every one of these.",
+ "CR-10":"He is not done. In a vacant lot a rose is growing, and in the weeds beside it lies a key.",
+ "CR-11":"The Prisoner’s monkey is heroin. The Lady broke a blue plate at a wedding. Death is a man who pushes.",
+ "CR-12":"A turtle holds up more than this world. So does a bear.",
+ "CR-13":"Bones can be borrowed.",
+ "CR-14":"What he left on a hill called Jericho he will one day carry to the Tower. Not this time."
+});
+const ROM=["I","II","III","IV","V"];
+const CHAP_NAMES=["The Gunslinger","The Way Station","The Oracle and the Mountains","The Slow Mutants","The Gunslinger and the Dark Man"];
+function chap(){return +scene().id.split(".")[0]}
+function firstOf(n){return S.findIndex(s=>s.id.startsWith(n+"."))}
+function chapState(n,base){const f=fresh();f.scene=firstOf(n);f.water=n===2?48:100;f.jaw=n===3;if(base){f.cr=base.cr;f.sound=base.sound;f.done=Object.assign({},base.done);f.khef=base.khef||0;f.flags=Object.assign({},base.flags)}return f}
+const JAWLINES={2:"Yellow, cool, three teeth left in it. Heavier than a bone should be.",3:"He can feel it in his pocket like a second pulse.",5:"Walter’s, or what Walter left. It is lighter than the other one was."};
+function updJaw(){const b=$("jawBtn");if(b)b.hidden=!st.jaw}
+
+/* tower silhouette, our own design */
+function tower(x,y,s,c,o){return`<g transform="translate(${x} ${y}) scale(${s})" fill="${c}" opacity="${o}"><path d="M-14 0 L-11 -60 L-15 -66 L-9 -70 L-8 -110 L-12 -114 L-6 -120 L-5 -150 L-8 -154 L-2 -160 L-1 -178 L1 -172 L3 -186 L5 -164 L9 -158 L6 -152 L8 -128 L13 -122 L9 -116 L10 -84 L16 -78 L11 -72 L14 0Z"/><path d="M-9 -140 l-7 -6 l6 -2z M9 -100 l8 -8 l-2 10z"/></g>`}
+Object.assign(ART,{
+ sixteen(){return svg(grad("sk",["#FBF6EA","#F1E6CF","#E2CFA4"])+grad("gd",["#E6D4AC","#C09F62"]),`<rect width="500" height="300" fill="url(#sk)"/><circle cx="250" cy="70" r="46" fill="#FFFDF5" opacity=".9"/><circle cx="250" cy="70" r="80" fill="#FFFDF5" opacity=".25"/><path d="M0 200 Q100 170 200 196 T400 186 T500 196 L500 300 L0 300Z" fill="url(#gd)"/><path d="M0 250 Q140 220 280 248 T500 238 L500 300 L0 300Z" fill="#C4A366"/>${fig(300,214,.55)}<path d="M300 216 q-40 30 -120 70" stroke="#8A6A35" stroke-width="1" stroke-dasharray="1 6" fill="none"/>`)},
+ station(){return svg(grad("sk",["#F0E4C8","#E8D2A0"])+grad("gd",["#D9BD86","#A98348"]),`<rect width="500" height="300" fill="url(#sk)"/>${land(196,192,"gd")}<rect x="140" y="140" width="190" height="56" fill="#8C8577"/><path d="M130 142 L340 142 L330 126 L140 126Z" fill="#6E685C"/>${[0,1,2,3,4,5,6,7].map(i=>`<rect x="${146+i*23}" y="144" width="2" height="50" fill="#5E584C"/>`).join("")}<rect x="340" y="152" width="80" height="44" fill="#7A7366"/><path d="M340 152 L380 140 L420 152" fill="#5E584C"/><rect x="366" y="164" width="22" height="32" fill="#1E1712"/><rect x="372" y="170" width="7" height="20" fill="#0c0906"/>${fig(376,196,.55,"#0c0906")}<path d="M60 202 L130 202 M60 196 l0 10 M90 196 l0 10 M120 196 l0 10" stroke="#5E4A30" stroke-width="2"/>`)},
+ pump(){return svg(grad("gl",["#E3B85A","#C9962E"]),`<rect width="500" height="300" fill="#2A1C12"/><rect x="150" y="10" width="200" height="290" fill="url(#gl)" opacity=".75"/>${[0,1,2,3,4,5,6,7,8].map(i=>`<rect x="${i*20-4}" y="0" width="16" height="300" fill="#3A2718" opacity="${.95-i*.04}"/><rect x="${362+i*17}" y="0" width="13" height="300" fill="#3A2718" opacity="${.6+i*.04}"/>`).join("")}<rect x="226" y="120" width="44" height="130" fill="#6F7478"/><rect x="220" y="112" width="56" height="12" fill="#50565a"/><path d="M270 150 L300 150 L300 168" stroke="#50565a" stroke-width="8" fill="none"/><path d="M300 172 L300 250" stroke="#CFE4EA" stroke-width="2.5" opacity=".8"/><ellipse cx="300" cy="254" rx="16" ry="4" fill="#CFE4EA" opacity=".4"/><circle cx="248" cy="160" r="5" fill="#9ACD32" opacity=".5"/>`)},
+ knuckles(){return svg("",`<rect width="500" height="300" fill="#2E2F33"/>${Array.from({length:9},(_,i)=>`<rect x="${20+i*56}" y="${40+(i%3)*14}" width="40" height="${260-(i%3)*14}" fill="#26272B"/>`).join("")}${Array.from({length:30},(_,i)=>`<rect x="${26+(i*37)%460}" y="${60+(i*53)%200}" width="5" height="7" fill="#E3C27A" opacity=".35"/>`).join("")}<circle cx="150" cy="250" r="7" fill="#F4E3B6" opacity=".7"/><circle cx="190" cy="250" r="7" fill="#F4E3B6" opacity=".7"/>${fig(390,262,1.1,"#0a0a0c")}<rect x="0" y="180" width="500" height="120" fill="#120d0a" opacity=".55"/><g transform="translate(250 212)"><path d="M-110 30 Q-60 0 0 8 Q60 0 110 30 L110 60 L-110 60Z" fill="#8A5A3A"/><rect x="-8" y="-26" width="16" height="30" rx="3" fill="#C9A15A"/><path d="M-8 -26 q8 -12 16 0z" fill="#B87333"/></g>`)},
+ stationnight(){return svg(`<radialGradient id="cn" cx=".62" cy=".6" r=".45"><stop offset="0" stop-color="#F2B24A" stop-opacity=".55"/><stop offset="1" stop-color="#0c0906"/></radialGradient>`,`<rect width="500" height="300" fill="#0c0906"/><rect width="500" height="300" fill="url(#cn)"/><rect x="306" y="170" width="6" height="14" fill="#E8DCC4"/><ellipse cx="309" cy="166" rx="3" ry="5" fill="#FFE1A0"/><path d="M90 250 Q130 226 190 236 Q220 240 230 252Z" fill="#241911"/>${Array.from({length:10},(_,i)=>`<rect x="${i*50}" y="0" width="3" height="300" fill="#1a130e"/>`).join("")}`)},
+ cellar(){return svg("",`<rect width="500" height="300" fill="#070504"/><path d="M300 40 L312 120 L304 190 L316 300" stroke="#2A2019" stroke-width="10" fill="none"/><path d="M308 120 C 310 170 306 230 300 300" stroke="#E0CFA8" stroke-width="3" fill="none" stroke-dasharray="3 5" opacity=".8"><animate attributeName="stroke-dashoffset" from="0" to="-80" dur="2s" repeatCount="indefinite"/></path><path d="M270 300 Q300 270 330 300Z" fill="#C9B288" opacity=".55"/>${[0,1,2].map(i=>`<rect x="${40+i*70}" y="${110+i*4}" width="60" height="4" fill="#1a130e"/>`).join("")}<circle cx="70" cy="104" r="6" fill="#3A2718"/>`)},
+ yard(){return svg(grad("sk",["#F6F0DF","#E8DCC4"]),`<rect width="500" height="300" fill="url(#sk)"/><rect x="0" y="170" width="500" height="130" fill="#CDBB98"/>${Array.from({length:6},(_,r)=>Array.from({length:10},(_,c)=>`<rect x="${c*52+(r%2)*26-10}" y="${176+r*20}" width="48" height="16" fill="#BFAB86" opacity=".6"/>`).join("")).join("")}<rect x="0" y="90" width="500" height="80" fill="#A89478"/><rect x="0" y="80" width="500" height="12" fill="#8A7A60"/><path d="M330 40 q10 -8 22 0 q-8 -2 -11 6z" fill="#1E1712"/>${fig(210,250,1,"#2B2019")}<path d="M216 225 l22 -30" stroke="#2B2019" stroke-width="2.5"/>${fig(262,250,.75,"#2B2019")}`)},
+ gallows(){return svg(grad("sk",["#D9DCD8","#EDE6D6"]),`<rect width="500" height="300" fill="url(#sk)"/><path d="M0 230 Q250 200 500 232 L500 300 L0 300Z" fill="#8F8A76"/><path d="M190 230 L190 60 L320 60 M190 90 L220 60" stroke="#3A3228" stroke-width="7" fill="none"/><path d="M290 60 L290 110" stroke="#3A3228" stroke-width="2"/><g fill="#2B2B2B"><path d="M284 110 h12 l2 40 h-16z"/><circle cx="290" cy="104" r="6"/><rect x="284" y="100" width="12" height="3" fill="#0c0c0c"/></g><rect x="170" y="160" width="160" height="8" fill="#3A3228"/>${[[230,52],[258,54],[312,52]].map(p=>`<path d="M${p[0]} ${p[1]} q4 -6 9 0 l-2 -1 l-1 3z" fill="#111"/>`).join("")}${[[120,40],[380,70],[410,50]].map(p=>`<path d="M${p[0]} ${p[1]} q8 -8 16 0 q-8 -4 -16 0z" fill="#111"/>`).join("")}${fig(230,262,.8,"#2B2019")}${fig(254,262,.75,"#2B2019")}`)},
+ slope(){return svg(grad("sk",["#6D5A72","#A997B8","#F4B58A"])+grad("gd",["#5E4E6A","#3A3044"]),`<rect width="500" height="300" fill="url(#sk)"/><path d="M0 170 L120 90 L200 140 L300 60 L420 130 L500 100 L500 300 L0 300Z" fill="url(#gd)"/><path d="M0 230 Q200 200 500 236 L500 300 L0 300Z" fill="#B8935A"/><circle cx="296" cy="84" r="1.8" fill="#1E1712"/>${fig(120,250,.7)}${fig(140,250,.45)}`)},
+ green(){return svg(grad("sk",["#DDE6C8","#B9CF96"])+grad("gd",["#6B8F4E","#3E6B3A"]),`<rect width="500" height="300" fill="url(#sk)"/>${land(170,176,"gd")}<path d="M0 220 Q200 200 500 230" stroke="#9CC3D0" stroke-width="10" fill="none" opacity=".8"/>${[60,180,400].map(x=>`<g><path d="M${x} 176 L${x} 90" stroke="#2F3F24" stroke-width="6"/>${Array.from({length:9},(_,i)=>`<path d="M${x} ${92+i*3} Q${x-40+i*10} ${110+i*4} ${x-30+i*8} ${170+i%3*6}" stroke="#4F7A3A" stroke-width="2" fill="none" opacity=".8"/>`).join("")}</g>`).join("")}${fig(290,236,.7)}${fig(315,236,.5)}`)},
+ ring(){return svg(`<radialGradient id="rg" cx=".5" cy=".62" r=".35"><stop offset="0" stop-color="#9ACD32" stop-opacity=".35"/><stop offset="1" stop-color="#0a0c10" stop-opacity="0"/></radialGradient>`,`<rect width="500" height="300" fill="#0a0c14"/>${Array.from({length:50},(_,i)=>`<circle cx="${(i*97)%500}" cy="${(i*41)%150}" r="${.5+(i%3)*.4}" fill="#E8DCC4"/>`).join("")}<path d="M0 220 Q250 180 500 222 L500 300 L0 300Z" fill="#141a12"/><rect width="500" height="300" fill="url(#rg)"/>${[150,190,230,275,315,350].map((x,i)=>`<rect x="${x}" y="${170-(i%2)*8}" width="16" height="${50+(i%2)*8}" rx="5" fill="#1c2018"/>`).join("")}<rect x="220" y="204" width="60" height="8" fill="#2a2e24"/><path d="M228 204 l44 0" stroke="#E8DCC4" stroke-width="3" opacity=".6"/>`)},
+ tied(){return svg("",`<rect width="500" height="300" fill="#0b0d14"/><circle cx="400" cy="60" r="18" fill="#E8DCC4" opacity=".85"/><path d="M0 230 Q250 210 500 232 L500 300 L0 300Z" fill="#161a14"/><path d="M200 232 L204 150 M204 170 q-30 -10 -40 10 M204 160 q30 -20 40 0" stroke="#2A3024" stroke-width="4" fill="none"/><path d="M210 240 q30 -14 60 0" fill="#2A2A30"/><path d="M204 232 q10 6 20 6" stroke="#8A7A60" stroke-width="1.2" fill="none"/><rect x="254" y="234" width="10" height="3" fill="#E8DCC4" opacity=".8"/>`)},
+ oracle(){return svg(grad("sk",["#C9C13A","#9ACD32","#3E6B3A"]),`<rect width="500" height="300" fill="url(#sk)"/>${Array.from({length:7},(_,i)=>`<path d="M${40+i*70} 0 L${80+i*70} 300" stroke="#F4F0A0" stroke-width="18" opacity=".12"/>`).join("")}${[330,360,392,424].map((x,i)=>`<rect x="${x}" y="${120+(i%2)*6}" width="18" height="${60-(i%2)*6}" rx="6" fill="#2F4A26" opacity=".85"/>`).join("")}<ellipse cx="220" cy="236" rx="140" ry="36" fill="#0e1a10"/><g opacity=".75" fill="#D8E0C0"><ellipse cx="220" cy="236" rx="14" ry="10"/><rect x="212" y="242" width="16" height="6"/><circle cx="215" cy="234" r="3" fill="#0e1a10"/><circle cx="225" cy="234" r="3" fill="#0e1a10"/></g>${fig(150,210,1.1,"#1E2A16")}${Array.from({length:12},(_,i)=>`<path d="M${60+i*38} 0 Q${50+i*38} 60 ${70+i*36} 120" stroke="#2F4A26" stroke-width="2" fill="none" opacity=".7"/>`).join("")}`)},
+ climb(){return svg(grad("sk",["#A8AEB6","#D0CCC4"]),`<rect width="500" height="300" fill="url(#sk)"/><path d="M0 300 L0 120 L90 80 L150 110 L240 30 L330 70 L420 20 L500 60 L500 300Z" fill="#6E6660"/><path d="M0 300 L60 200 L180 230 L260 150 L380 190 L500 140 L500 300Z" fill="#8A5A44"/><path d="M60 200 L180 230 L260 150 L380 190" stroke="#D0C0A8" stroke-width="2" fill="none" stroke-dasharray="4 4"/><g transform="translate(330 72) scale(.6)" fill="#0c0906"><path d="M-6 0 L-7 -16 Q0 -26 7 -16 L6 0Z"/><circle cx="0" cy="-22" r="3.6"/></g>${fig(160,236,.6)}${fig(176,236,.45)}`)},
+ switchback(){return svg("",`<rect width="500" height="300" fill="#0d0f16"/>${Array.from({length:40},(_,i)=>`<circle cx="${(i*89)%500}" cy="${(i*37)%140}" r=".8" fill="#E8DCC4" opacity=".8"/>`).join("")}<path d="M0 300 L0 160 L120 110 L220 150 L330 90 L500 140 L500 300Z" fill="#1c1a1e"/><path d="M180 260 L320 240" stroke="#2a2630" stroke-width="30"/>${fig(230,256,.9,"#050506")}<path d="M270 252 q10 -14 22 0z" fill="#050506"/>`)},
+ tunnel(){return svg(`<radialGradient id="tn" cx=".5" cy=".5" r=".2"><stop offset="0" stop-color="#3a2c20"/><stop offset="1" stop-color="#050403"/></radialGradient>`,`<rect width="500" height="300" fill="#050403"/><ellipse cx="250" cy="150" rx="70" ry="60" fill="url(#tn)"/><path d="M150 300 L244 162 M350 300 L256 162" stroke="#3a2c20" stroke-width="2"/>${Array.from({length:10},(_,i)=>{const t=Math.pow(i/10,1.8),y=300-t*138,hw=100-t*90;return`<path d="M${250-hw} ${y} L${250+hw} ${y}" stroke="#241911" stroke-width="${3-t*2}"/>`}).join("")}`)},
+ hall(){return svg(`<radialGradient id="hl" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="#F2B24A" stop-opacity=".6"/><stop offset="1" stop-color="#1E1712"/></radialGradient>`,`<rect width="500" height="300" fill="#1E1712"/><rect width="500" height="300" fill="url(#hl)"/>${Array.from({length:4},(_,r)=>Array.from({length:14},(_,c)=>`<circle cx="${20+c*35}" cy="${30+r*22}" r="2" fill="#FFE1A0" opacity="${.9-r*.15}"/>`).join("")).join("")}<rect x="0" y="120" width="500" height="10" fill="#3A2718"/>${[10,40,70,420,450,480].map(x=>`<rect x="${x}" y="130" width="3" height="40" fill="#3A2718"/>`).join("")}<rect x="0" y="130" width="500" height="4" fill="#3A2718"/><ellipse cx="250" cy="270" rx="200" ry="20" fill="#2A1C12" opacity=".6"/><g transform="translate(250 262)" fill="#150f0b"><path d="M-22 0 Q-24 -30 -8 -44 L-2 -44 Q-10 -20 -2 0Z"/><circle cx="-6" cy="-50" r="5"/><path d="M4 0 L6 -44 L14 -44 L16 0Z"/><circle cx="10" cy="-50" r="5"/><path d="M-30 0 Q-10 -20 -8 -40 L-2 -40 Q-2 -10 10 0Z" opacity=".8"/></g><rect x="200" y="96" width="100" height="10" fill="#3A2718"/>${fig(250,96,.5,"#150f0b")}`)},
+ handcar(){return svg("",`<rect width="500" height="300" fill="#050403"/><path d="M60 300 L246 150 M440 300 L254 150" stroke="#4a3a2c" stroke-width="2"/><rect x="170" y="238" width="160" height="16" fill="#241911"/><circle cx="190" cy="258" r="10" fill="#1a130e"/><circle cx="310" cy="258" r="10" fill="#1a130e"/><path d="M250 238 L250 200 M200 214 L300 190" stroke="#3a2c20" stroke-width="6"/>${fig(206,236,.9,"#140d09")}${fig(290,236,.6,"#140d09")}`)},
+ door(){return svg("",`<rect width="500" height="300" fill="#D8C79E"/><rect x="0" y="0" width="500" height="300" fill="#A88E62" opacity=".4"/><rect x="220" y="40" width="120" height="260" fill="#5A3F28"/><path d="M220 40 L260 52 L260 300 L220 300Z" fill="#FFF3D0"/><rect x="262" y="52" width="76" height="248" fill="#2A1C12"/><circle cx="300" cy="110" r="3" fill="#7A1E1E"/>${fig(120,290,1.8,"#3A2A1C")}<path d="M0 290 L500 290" stroke="#8A7A60" stroke-width="2"/>`)},
+ testyard(){return svg(grad("sk",["#FFFFFF","#F3EEDC"]),`<rect width="500" height="300" fill="url(#sk)"/><rect x="0" y="180" width="500" height="120" fill="#E3D6B8"/><rect x="0" y="120" width="500" height="60" fill="#C9B998"/>${Array.from({length:14},(_,i)=>`${fig(20+i*36,122,.35,"#6B5A48")}`).join("")}${fig(210,262,1.2,"#1E1712")}<path d="M290 190 L330 280" stroke="#1E1712" stroke-width="3"/>${fig(300,262,1.2,"#1E1712")}<path d="M250 150 q12 -14 30 -4 q-14 0 -16 10z" fill="#1E1712"/>`)},
+ lowertown(){return svg("",`<rect width="500" height="300" fill="#0e0c12"/><path d="M0 300 L0 140 L80 120 L80 300 M100 300 L100 150 L200 130 L200 300 M300 300 L300 110 L400 140 L400 300" fill="#16131b"/><rect x="330" y="200" width="36" height="28" fill="#F2B24A"/><rect x="330" y="200" width="36" height="28" fill="#7A1E1E" opacity=".25"/><path d="M0 300 L500 300" stroke="#2a2630"/>${fig(250,286,.9,"#050506")}`)},
+ dark(){return svg("",`<rect width="500" height="300" fill="#050403"/><path d="M200 300 L246 160 M300 300 L254 160" stroke="#1a130e" stroke-width="2"/><circle cx="250" cy="230" r="40" fill="#120d0a"/>`)},
+ mutants(){return svg(`<radialGradient id="mf" cx=".5" cy=".38" r=".4"><stop offset="0" stop-color="#FFE1A0" stop-opacity=".8"/><stop offset=".2" stop-color="#F2622A" stop-opacity=".3"/><stop offset="1" stop-color="#050403" stop-opacity="0"/></radialGradient>`,`<rect width="500" height="300" fill="#050403"/><rect width="500" height="300" fill="url(#mf)"/>${[[60,250,1.4],[120,280,1.8],[420,260,1.5],[370,290,2],[20,200,1],[470,210,1]].map(p=>`<g transform="translate(${p[0]} ${p[1]}) scale(${p[2]})" fill="#3E6B3A" opacity=".9"><ellipse cx="0" cy="-30" rx="12" ry="14"/><path d="M-18 0 Q-20 -24 0 -20 Q20 -24 18 0Z"/><path d="M10 -18 Q30 -30 40 -26" stroke="#5E8B4A" stroke-width="4" fill="none"/></g>`).join("")}${fig(250,210,1.4,"#140d09")}${fig(222,214,.9,"#140d09")}`)},
+ terminal(){return svg("",`<rect width="500" height="300" fill="#1a1a1c"/><path d="M200 0 L300 0 L360 300 L140 300Z" fill="#8A8A86" opacity=".25"/>${[40,120,380,440].map((x,i)=>`<rect x="${x}" y="${50+i%2*10}" width="50" height="18" fill="#2c2c30"/><rect x="${x+6}" y="${56+i%2*10}" width="38" height="3" fill="#6a6a70"/>`).join("")}<rect x="0" y="230" width="500" height="70" fill="#242428"/>${Array.from({length:9},(_,i)=>`<g transform="translate(${30+i*55} 232)" fill="#4a3a2c"><path d="M-6 0 L-6 -18 Q0 -26 6 -18 L6 0Z"/><circle cx="0" cy="-24" r="4"/></g>`).join("")}<rect x="0" y="232" width="500" height="4" fill="#3a3a40"/>${fig(250,286,.8,"#0c0c0e")}${fig(275,286,.55,"#0c0c0e")}`)},
+ trestle(){return svg(`<radialGradient id="tr" cx=".82" cy=".4" r=".4"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#1a1410" stop-opacity="0"/></radialGradient>`,`<rect width="500" height="300" fill="#0c0908"/><rect width="500" height="300" fill="url(#tr)"/><path d="M0 140 L500 120" stroke="#3a2c20" stroke-width="6"/>${Array.from({length:20},(_,i)=>i%5===3?"":`<rect x="${i*26}" y="${138-i}" width="14" height="6" fill="#2a1f16"/>`).join("")}${Array.from({length:9},(_,i)=>`<path d="M${i*60} ${142-i*2.4} L${i*60+30} 300 M${i*60+30} ${142-i*2.4} L${i*60} 300" stroke="#1e1610" stroke-width="2"/>`).join("")}<g transform="translate(430 118) scale(.7)" fill="#050403"><path d="M-6 0 L-7 -16 Q0 -26 7 -16 L6 0Z"/><circle cx="0" cy="-22" r="3.6"/></g>${fig(180,132,.8,"#050403")}<rect x="0" y="260" width="500" height="40" fill="#050403"/>`)},
+ golgotha(){return svg(grad("sk",["#A997B8","#D9B0A0","#F4B58A"]),`<rect width="500" height="300" fill="url(#sk)"/><path d="M0 150 L80 100 L160 130 L340 90 L420 120 L500 100 L500 300 L0 300Z" fill="#5E5046"/><ellipse cx="250" cy="250" rx="260" ry="70" fill="#E8DCC4"/>${Array.from({length:40},(_,i)=>`<path d="M${(i*67)%480+10} ${210+(i*23)%80} l${6+i%5*2} ${(i%3-1)*3}" stroke="#B8A888" stroke-width="2.4" stroke-linecap="round"/>`).join("")}<ellipse cx="190" cy="262" rx="6" ry="5" fill="#C9B998"/><circle cx="188" cy="261" r="1.2" fill="#5E5046"/><g transform="translate(270 232) scale(1.3)" fill="#140d09"><path d="M-8 0 L-9 -14 Q0 -26 9 -14 L8 0Z"/><circle cx="0" cy="-20" r="3.6"/><path d="M-4 -24 Q0 -30 4 -24" fill="#140d09"/></g><rect x="252" y="232" width="36" height="8" fill="#8A7A60"/>${fig(130,272,1)}`)},
+ golgothafire(){return svg(`<radialGradient id="gf" cx=".5" cy=".7" r=".5"><stop offset="0" stop-color="#6FA8DC" stop-opacity=".55"/><stop offset=".5" stop-color="#3A3044" stop-opacity=".4"/><stop offset="1" stop-color="#120d14"/></radialGradient>`,`<rect width="500" height="300" fill="#120d14"/><rect width="500" height="300" fill="url(#gf)"/><ellipse cx="250" cy="280" rx="260" ry="50" fill="#3A3434"/>${Array.from({length:24},(_,i)=>`<path d="M${(i*67)%480+10} ${250+(i*13)%40} l${6+i%5*2} ${(i%3-1)*3}" stroke="#6A625A" stroke-width="2.4" stroke-linecap="round"/>`).join("")}<ellipse cx="250" cy="230" rx="22" ry="6" fill="#6FA8DC" opacity=".85"/><path d="M240 230 Q246 200 250 190 Q254 206 260 230Z" fill="#BFE0FF" opacity=".85"/>${fig(170,244,1.3,"#08060a")}<g transform="translate(330 244) scale(1.3)" fill="#08060a"><path d="M-8 0 L-9 -14 Q0 -26 9 -14 L8 0Z"/><circle cx="0" cy="-20" r="3.6"/></g>`)},
+ black(){return svg("",`<rect width="500" height="300" fill="#000"/>`)},
+ embersdie(){return svg("",`<rect width="500" height="300" fill="#070506"/><ellipse cx="250" cy="236" rx="18" ry="4" fill="#7A1E1E" opacity=".7"/><ellipse cx="250" cy="235" rx="6" ry="2" fill="#F2622A" opacity=".7"/>${fig(186,246,1.3,"#030203")}<g transform="translate(314 246) scale(1.3)" fill="#030203"><path d="M-8 0 L-9 -14 Q0 -26 9 -14 L8 0Z"/><circle cx="0" cy="-20" r="3.6"/></g>`)},
+ bones(){return svg(grad("sk",["#B9B6B0","#D8D2C4"]),`<rect width="500" height="300" fill="url(#sk)"/><path d="M0 150 L80 100 L160 130 L340 90 L420 120 L500 100 L500 300 L0 300Z" fill="#7A726A"/><ellipse cx="250" cy="260" rx="270" ry="70" fill="#D8D0BE"/><g transform="translate(300 250)"><path d="M-60 0 Q-20 -12 40 -4 L50 8 Q0 14 -60 10Z" fill="#2B2B2B" opacity=".7"/><ellipse cx="44" cy="-4" rx="9" ry="8" fill="#EDE6D6"/><circle cx="41" cy="-6" r="1.8" fill="#2B2B2B"/><circle cx="47" cy="-6" r="1.8" fill="#2B2B2B"/>${Array.from({length:6},(_,i)=>`<path d="M${-20+i*8} -6 q2 6 0 12" stroke="#EDE6D6" stroke-width="1.6" fill="none"/>`).join("")}</g>${fig(150,262,1,"#3A3A3A")}<ellipse cx="220" cy="266" rx="16" ry="4" fill="#8A847A"/>`)},
+ sea(){return svg(grad("sk",["#8B7A93","#A997B8","#F4B58A","#F7D2B0"])+grad("se",["#9F92B8","#6D6690"]),`<rect width="500" height="300" fill="url(#sk)"/>${tower(330,176,.62,"#6D5A72",.55)}<path d="M200 150 Q280 130 380 150" stroke="#E9DDE6" stroke-width="18" opacity=".35" fill="none"/><rect x="0" y="176" width="500" height="70" fill="url(#se)"/><circle cx="250" cy="176" r="10" fill="#FFF3E0"/><path d="M0 176 L500 176" stroke="#F2622A" stroke-width="2"/><path d="M244 178 L256 178 L262 244 L238 244Z" fill="#F4B58A" opacity=".22"/><path d="M0 246 Q250 234 500 248 L500 300 L0 300Z" fill="#C9B288"/><path d="M0 246 Q250 234 500 248" stroke="#E8DCC4" stroke-width="2" fill="none"/>${fig(120,272,1,"#241a1e")}`)}
+});
+
+/* ---------- sound for every scene ---------- */
+A.play=function(name){if(!this.ctx||name===this.ambName)return;this.ambName=name;this.stopAmb();if(name==="none")return;
+ const c=this.ctx,g=c.createGain();g.gain.value=0;g.connect(this.master);const nodes=[];const timers=[];
+ const noise=(type,freq,q)=>{const s=this.src(),f=c.createBiquadFilter();f.type=type;f.frequency.value=freq;if(q)f.Q.value=q;s.connect(f);f.connect(g);s.start();nodes.push(s);return f};
+ const osc=(fr,type,gain)=>{const o=c.createOscillator(),og=c.createGain();o.type=type||"sine";o.frequency.value=fr;og.gain.value=gain;o.connect(og);og.connect(g);o.start();nodes.push(o);return og};
+ const lfo=(target,rate,depth)=>{const l=c.createOscillator(),lg=c.createGain();l.frequency.value=rate;lg.gain.value=depth;l.connect(lg);lg.connect(target);l.start();nodes.push(l)};
+ let lvl=.25;
+ if(name==="wind"||name==="storm"){const f=noise("bandpass",name==="storm"?700:420,.7);lfo(f.frequency,.09,name==="storm"?300:180);lvl=name==="storm"?.5:.28}
+ if(name==="fire"){noise("lowpass",380);lvl=.12;timers.push(setInterval(()=>{if(Math.random()<.55)this.pop(.05+Math.random()*.08)},230))}
+ if(name==="piano"){noise("lowpass",300);lvl=.05;const notes=[196,220,247,262,294,330,349,392,440];timers.push(setInterval(()=>{if(Math.random()<.6)this.key(notes[Math.floor(Math.random()*notes.length)]*(Math.random()<.3?.5:1))},420))}
+ if(name==="birds"){const f=noise("bandpass",380,.6);lfo(f.frequency,.06,120);lvl=.14;timers.push(setInterval(()=>{if(Math.random()<.35)this.chirp()},700))}
+ if(name==="drone"){osc(55,"sine",.5);const o2=osc(82.4,"triangle",.18);lfo(o2.gain,.07,.15);lvl=.22}
+ if(name==="drip"){noise("lowpass",160);lvl=.2;timers.push(setInterval(()=>{if(Math.random()<.4)this.drip()},600))}
+ if(name==="pump"){osc(60,"square",.03);noise("bandpass",2200,2);lvl=.18}
+ if(name==="rails"){noise("lowpass",260);lvl=.2;let n=0;timers.push(setInterval(()=>{n++;this.pop(n%2?.18:.12)},260))}
+ if(name==="strings"){lvl=.2;const ch=[[220,277,330],[196,247,294],[175,220,262]];let i=0;const play=()=>{ch[i++%3].forEach(f=>this.pad(f))};play();timers.push(setInterval(play,3200))}
+ if(name==="river"){noise("lowpass",500);lvl=.35}
+ if(name==="sea"){const f=noise("lowpass",700);lvl=.3;const sw=c.createGain();g.disconnect();g.connect(sw);sw.connect(this.master);sw.gain.value=.6;lfo(sw.gain,.08,.4)}
+ g.gain.setTargetAtTime(lvl,c.currentTime,1);
+ this.amb={g,stop:()=>{nodes.forEach(n=>{try{n.stop()}catch(e){}});timers.forEach(clearInterval)}}};
+A.chirp=function(){const c=this.ctx,o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.frequency.setValueAtTime(2600+Math.random()*900,t);o.frequency.exponentialRampToValueAtTime(1800,t+.12);g.gain.setValueAtTime(.04,t);g.gain.exponentialRampToValueAtTime(.001,t+.14);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+.16)};
+A.drip=function(){const c=this.ctx,o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.frequency.setValueAtTime(1400+Math.random()*600,t);o.frequency.exponentialRampToValueAtTime(700,t+.08);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+.22)};
+A.pad=function(f){const c=this.ctx,o=c.createOscillator(),lp=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime;o.type="sawtooth";o.frequency.value=f;lp.type="lowpass";lp.frequency.value=600;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+1);g.gain.linearRampToValueAtTime(0,t+3.1);o.connect(lp);lp.connect(g);g.connect(this.master);o.start(t);o.stop(t+3.2)};
+A.whoosh=function(){if(!this.ctx)return;const c=this.ctx,t=c.currentTime,s=c.createBufferSource();s.buffer=this.noise;const f=c.createBiquadFilter();f.type="bandpass";f.frequency.setValueAtTime(400,t);f.frequency.exponentialRampToValueAtTime(2400,t+.4);const g=c.createGain();g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.5,t+.2);g.gain.exponentialRampToValueAtTime(.001,t+.5);s.connect(f);f.connect(g);g.connect(this.master);s.start(t,0,.6)};
+A.tone=function(f,dur){if(!this.ctx)return;const c=this.ctx,o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+2);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+.1)};
+
+/* ---------- the drop ---------- */
+function dropGame(done){
+ const o=document.createElement("div");o.id="drop";o.className="game";
+ o.innerHTML=`<svg class="hands" viewBox="0 0 300 200" aria-hidden="true"><path d="M0 70 Q60 60 118 78 L140 84" stroke="#E8DCC4" stroke-width="16" stroke-linecap="round" fill="none"/><g id="jh"><path d="M300 150 Q230 140 170 108 L156 96" stroke="#C9A96E" stroke-width="11" stroke-linecap="round" fill="none"/></g><circle cx="148" cy="90" r="11" fill="#E8DCC4"/></svg><div class="meter"><i id="dm"></i></div><div class="cap" id="dcap">HOLD HIS HAND</div><div class="mib" id="mib"></div>`;
+ document.body.appendChild(o);let held=false,started=false,t0=0,raf=0,ended=false,said=false;
+ const dm=o.querySelector("#dm"),cap=o.querySelector("#dcap"),mib=o.querySelector("#mib");
+ const DUR=7000;
+ const tick=ts=>{if(ended)return;if(!started){raf=requestAnimationFrame(tick);return}const p=Math.min(1,(ts-t0)/DUR);dm.style.width=(100-p*100)+"%";o.querySelector("#jh").setAttribute("transform",`translate(${p*14} ${p*22})`);
+  if(p>.3&&!said){said=true;mib.textContent="— Let him go, gunslinger, the man in black called, very gently. Or keep him, and turn back. There is no third way off this bridge."}
+  if(p>=1){finish("The hand slid out of his.")}else raf=requestAnimationFrame(tick)};
+ const start=()=>{if(started)return;started=true;t0=performance.now()};
+ const down=e=>{e.preventDefault();held=true;cap.textContent="HOLDING";start()};
+ const up=e=>{e.preventDefault();if(!held)return;held=false;if(started&&!ended)finish("He let go.")};
+ o.addEventListener("pointerdown",down);o.addEventListener("pointerup",up);o.addEventListener("pointercancel",up);
+ const kd=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();if(!held)down(e)}},ku=e=>{if(e.key===" "||e.key==="Enter")up(e)};document.addEventListener("keydown",kd);document.addEventListener("keyup",ku);
+ setTimeout(()=>{if(!started)start()},3500);raf=requestAnimationFrame(tick);
+ function finish(line){if(ended)return;ended=true;cancelAnimationFrame(raf);document.removeEventListener("keydown",kd);document.removeEventListener("keyup",ku);o.removeEventListener("pointerdown",down);
+  cap.textContent="";mib.textContent=line;o.querySelector("#jh").style.transition="transform 1.6s ease-in, opacity 1.6s";o.querySelector("#jh").setAttribute("transform","translate(40 300)");o.querySelector("#jh").style.opacity=0;A.whoosh();
+  setTimeout(()=>{o.innerHTML=`<blockquote class="last">Go then. There are other worlds than these.<cite>Jake, falling. Stephen King, <i>The Gunslinger</i> (1982)</cite></blockquote><div class="cap" id="dt" style="opacity:0">TAP</div>`;
+   setTimeout(()=>{const t=o.querySelector("#dt");if(t)t.style.opacity=.8;let gone=false;const fin=()=>{if(gone)return;gone=true;document.removeEventListener("keydown",fk);o.remove();done()};const fk=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();fin()}};o.addEventListener("pointerdown",fin);document.addEventListener("keydown",fk)},2600)},2200)}}
+
+/* ---------- the seven cards ---------- */
+const CARD_FACE={
+ hanged:`<path d="M20 22 L60 22 M40 22 L40 40" stroke="#2B2019" stroke-width="3"/><path d="M40 40 L40 62 M40 48 L30 58 M40 48 L50 58 M40 62 L32 74 M40 62 L46 70 L38 74" stroke="#2B2019" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="40" cy="80" r="5" fill="#2B2019"/>`,
+ sailor:`<path d="M8 70 Q24 64 40 70 T72 70 L72 100 L8 100Z" fill="#2B3A4A"/><path d="M36 64 l0 -8 m-4 4 l4 -4 l4 4" stroke="#E8DCC4" stroke-width="2" fill="none"/><path d="M16 36 L64 36 L58 44 L22 44Z" fill="#5A3F28"/><circle cx="50" cy="30" r="5" fill="none" stroke="#2B2019" stroke-width="1.6"/><circle cx="50" cy="30" r="2.5" fill="none" stroke="#2B2019" stroke-width="1.2"/>`,
+ prisoner:`<rect x="10" y="14" width="60" height="4" fill="#2B2019"/>${[18,30,42,54,66].map(x=>`<rect x="${x-1}" y="18" width="2.5" height="70" fill="#2B2019"/>`).join("")}<circle cx="40" cy="50" r="6" fill="#6B5A48"/><path d="M34 58 L46 58 L48 84 L32 84Z" fill="#6B5A48"/><path d="M44 44 q8 -6 12 2 q-4 4 -8 2z" fill="#2B2019"/><path d="M54 44 q10 -10 6 -22" stroke="#7A1E1E" stroke-width="1.6" fill="none"/>`,
+ lady:`<circle cx="40" cy="36" r="14" fill="#E8DCC4" stroke="#2B2019" stroke-width="1.4"/><path d="M40 22 A14 14 0 0 1 40 50Z" fill="#2B2019"/><circle cx="40" cy="74" r="12" fill="none" stroke="#6B5A48" stroke-width="2"/>${[0,1,2,3,4,5].map(i=>`<path d="M40 74 L${40+12*Math.cos(i*1.047)} ${74+12*Math.sin(i*1.047)}" stroke="#6B5A48" stroke-width="1.2"/>`).join("")}<path d="M12 92 a8 4 0 0 1 16 0 z" fill="#3A5A8A"/><path d="M20 88 l2 4 l-3 2" stroke="#E8DCC4" stroke-width=".8" fill="none"/>`,
+ death:`<path d="M26 90 L28 40 Q40 22 52 40 L54 90Z" fill="#1E1712"/><path d="M58 20 L58 92 M58 20 Q40 16 30 26" stroke="#2B2019" stroke-width="2.4" fill="none"/>`,
+ tower:`<g transform="translate(40 96) scale(.44)">${""}</g>`,
+ life:`<circle cx="40" cy="34" r="12" fill="#F2B24A"/>${Array.from({length:10},(_,i)=>`<path d="M${40+15*Math.cos(i*.628)} ${34+15*Math.sin(i*.628)} L${40+21*Math.cos(i*.628)} ${34+21*Math.sin(i*.628)}" stroke="#F2B24A" stroke-width="1.6"/>`).join("")}<rect x="6" y="64" width="68" height="30" fill="#7A1E1E"/>${Array.from({length:12},(_,i)=>`<circle cx="${10+i*6}" cy="${68+(i%3)*8}" r="2" fill="#B8323A"/>`).join("")}`
+};
+CARD_FACE.tower=tower(40,98,.44,"#1E1712",1);
+function cardSVG(k,name){return`<svg viewBox="0 0 80 124"><rect x="1" y="1" width="78" height="122" rx="4" fill="#E8DCC4" stroke="#8A6A35" stroke-width="1.5"/><rect x="5" y="5" width="70" height="98" fill="none" stroke="#C9A96E" stroke-width=".8"/>${CARD_FACE[k]}<text x="40" y="116" text-anchor="middle" font-family="IM Fell English SC, Georgia, serif" font-size="8" fill="#2B2019">${name}</text></svg>`}
+const CARDS=[
+ {k:"hanged",n:"The Hanged Man",r:["The Hanged Man. That’s you, gunslinger. Hanging by one foot over the pit, and walking anyway. You’ve always had strength. You’ve never had anything else.","The Hanged Man. You. Hanging over the pit by one foot, and still walking. Strength, and something else lately, I see. Something you picked up in the desert. Put it down. It only makes the rope heavier."]},
+ {k:"sailor",n:"The Sailor",r:["The Sailor. A drowning boy, and no one throws him the line. You know him. You let go of him yourself.","The Sailor. He drowns, and no one throws the line. You wanted to. That’s the worst of it, isn’t it. You wanted to."]},
+ {k:"prisoner",n:"The Prisoner",r:["The Prisoner. A young man with a baboon on his back, and the baboon has a whip. Look for him. He is the first."]},
+ {k:"lady",n:"Lady of Shadows",r:["The Lady of Shadows. Two faces, one light and one dark. She sits at a wheel. She broke a blue plate once and has never forgiven the plate."]},
+ {k:"death",n:"Death",r:["Death. But not for you."]},
+ {k:"tower",n:"The Tower",r:["And this. He laid it across the Hanged Man. The Tower. I won’t tell you what it means. You wouldn’t believe me."]},
+ {k:"life",n:"Life",r:["The last. Life: a sun over a red field. Not for you, gunslinger. He flicked it into the fire, and it curled, and blackened, and burned."]}
+];
+function tarotGame(done){
+ const o=document.createElement("div");o.id="tarot";o.className="game";
+ o.innerHTML=`<div class="spread" id="spread">${CARDS.map((c,i)=>`<button class="card7" data-i="${i}" ${i?"disabled":""} aria-label="Turn card ${i+1}"><span class="back"></span><span class="face">${cardSVG(c.k,c.n)}</span></button>`).join("")}</div><p class="reading" id="reading"></p><div class="cap" id="tcap">TURN THE FIRST CARD</div>`;
+ document.body.appendChild(o);const btns=[...o.querySelectorAll(".card7")];let next=0;
+ btns.forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.i;if(i!==next)return;A.pop(.2);b.classList.add("up");b.disabled=true;const c=CARDS[i];
+  o.querySelector("#reading").textContent=c.r.length>1?c.r[st.khef>0?1:0]:c.r[0];
+  if(c.k==="tower"){const a=btns[0].getBoundingClientRect(),m=b.getBoundingClientRect();b.style.transform=`translate(${a.left-m.left}px,${a.top-m.top}px) rotate(90deg)`;b.style.zIndex=3}
+  if(c.k==="life"){setTimeout(()=>{b.classList.add("burn");A.pop(.5)},1400)}
+  next++;if(next<btns.length){btns[next].disabled=false;o.querySelector("#tcap").textContent="TURN THE NEXT CARD";setTimeout(()=>btns[next]&&btns[next].focus(),50)}
+  else{o.querySelector("#tcap").textContent="";setTimeout(()=>{o.querySelector("#tcap").textContent="TAP TO GO ON";let gone=false;const fin=e=>{if(gone)return;gone=true;document.removeEventListener("keydown",fk);o.remove();done()};const fk=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();fin()}};o.addEventListener("pointerdown",fin);document.addEventListener("keydown",fk)},3200)}
+ }));
+ setTimeout(()=>btns[0].focus(),50)}
+
+/* ---------- the vision ---------- */
+function visionGame(done){A.play("none");A.tone(110,24);
+ const o=document.createElement("div");o.id="vision";o.className="game";o.innerHTML=`<canvas></canvas><div class="vq" id="vq" hidden><p id="vqt">Renounce the Tower. Go your way, and live.</p><div class="row"><button class="btn" id="vRen">RENOUNCE</button><button class="btn" id="vRef">REFUSE</button></div></div><div class="cap" id="vcap">HOLD TO FALL FASTER</div>`;document.body.appendChild(o);
+ const cv=o.querySelector("canvas"),cx=cv.getContext("2d");let w,h;const fit=()=>{const d=Math.min(2,devicePixelRatio||1);w=cv.clientWidth;h=cv.clientHeight;cv.width=w*d;cv.height=h*d;cx.setTransform(d,0,0,d,0,0)};fit();addEventListener("resize",fit);
+ let t=0,last=performance.now(),fast=false,phase="fall",grass=0,renounced=0,ended=false;const stars=Array.from({length:260},()=>[Math.random(),Math.random(),Math.random()]);
+ o.addEventListener("pointerdown",()=>{fast=true});o.addEventListener("pointerup",()=>{fast=false});
+ const planet=(x,y,r,cols,bands)=>{const g=cx.createRadialGradient(x-r*.3,y-r*.3,r*.1,x,y,r);g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);cx.fillStyle=g;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();if(bands){cx.save();cx.beginPath();cx.arc(x,y,r,0,7);cx.clip();cx.globalAlpha=.35;for(let i=-4;i<5;i++){cx.fillStyle=i%2?"#8A4B22":"#E8DCC4";cx.fillRect(x-r,y+i*r*.22,r*2,r*.1)}cx.restore()}};
+ const env=(a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+ const frame=ts=>{if(!o.isConnected)return;const dt=Math.min(50,ts-last)/1000;last=ts;if(phase==="fall"){t+=dt*(fast?4:1);if(t>=24){phase="ask";o.querySelector("#vq").hidden=false;o.querySelector("#vcap").textContent="";o.querySelector("#vRef").focus()}}
+  if(phase==="grass"){grass=Math.min(1,grass+dt/5)}
+  cx.fillStyle="#000";cx.fillRect(0,0,w,h);const m=Math.min(w,h);
+  if(t<2){cx.fillStyle=`rgba(255,250,235,${1-t/2})`;cx.fillRect(0,0,w,h)}
+  const zoomStars=Math.min(1,t/18);stars.forEach(s=>{const k=t<18?1:Math.max(0,1-(t-18)/4);cx.fillStyle=`rgba(232,220,196,${s[2]*.8*k})`;cx.fillRect(s[0]*w,((s[1]+t*.02*s[2])%1)*h,1.2,1.2)});
+  const seq=[[2,6,"earth"],[6,9,"mars"],[9,12,"belt"],[12,15,"jup"],[15,18.5,"sat"]];
+  seq.forEach(([a,b,k])=>{if(t<a||t>b)return;const p=(t-a)/(b-a);const al=Math.min(1,p*4,(1-p)*4);cx.globalAlpha=al;const y=h*(1.1-p*1.2),x=w*.5;
+   if(k==="earth")planet(x,y,m*.28*(1.2-p*.6),["#8FB8D8","#1F3A5A"]);
+   if(k==="mars")planet(x,y,m*.16,["#E08A5A","#6A2A18"]);
+   if(k==="belt"){for(let i=0;i<70;i++){cx.fillStyle="#9A8A78";cx.beginPath();cx.arc((i*97%w),y+((i*53)%120)-60,1+i%3,0,7);cx.fill()}}
+   if(k==="jup")planet(x,y,m*.3,["#E3C9A0","#8A5A3A"],true);
+   if(k==="sat"){planet(x,y,m*.2,["#EAD9A8","#9A7A48"]);cx.strokeStyle="#D8C49A";cx.lineWidth=3;cx.beginPath();cx.ellipse(x,y,m*.36,m*.08,-.3,0,7);cx.stroke()}
+   cx.globalAlpha=1});
+  if(t>18.5&&t<23.5){const p=(t-18.5)/5,r=m*.4*(1-p),al=Math.min(1,(1-p)*3);cx.save();cx.translate(w/2,h/2);cx.rotate(t*.3);for(let i=0;i<500;i++){const a=i*.12,rr=(i/500)*r;cx.fillStyle=`rgba(232,220,196,${al*.7})`;cx.fillRect(Math.cos(a)*rr,Math.sin(a)*rr*.45,1.3,1.3);cx.fillRect(-Math.cos(a)*rr,-Math.sin(a)*rr*.45,1.3,1.3)}cx.restore()}
+  if(phase==="grass"||phase==="done"){const gh=m*.45*grass,bx=w/2,by=h*.8;cx.strokeStyle="#8A5AB8";cx.lineWidth=3;cx.beginPath();cx.moveTo(bx,by);cx.quadraticCurveTo(bx+8,by-gh*.6,bx+gh*.08,by-gh);cx.stroke();cx.fillStyle="rgba(169,151,184,.25)";cx.beginPath();cx.arc(bx,by-gh,gh*.2,0,7);cx.fill()}
+  requestAnimationFrame(frame)};requestAnimationFrame(frame);
+ const toGrass=msg=>{o.querySelector("#vqt").textContent=msg;o.querySelector(".row").hidden=true;setTimeout(()=>{o.querySelector("#vq").hidden=true;phase="grass";A.tone(165,8);
+   setTimeout(()=>{phase="done";o.querySelector("#vcap").textContent="TAP";let gone=false;const fin=()=>{if(gone)return;gone=true;document.removeEventListener("keydown",fk);removeEventListener("resize",fit);o.remove();done()};const fk=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();fin()}};o.addEventListener("pointerdown",fin);document.addEventListener("keydown",fk)},6000)},2600)};
+ o.querySelector("#vRef").onclick=e=>{e.stopPropagation();toGrass("— No, he said. Never.")};
+ o.querySelector("#vRen").onclick=e=>{e.stopPropagation();renounced++;if(renounced===1){o.querySelector("#vqt").textContent="He reached for the word. It would not come. Renounce the Tower, the dark said again. Go your way, and live."}else toGrass("The word would not come. It never would. — No, he said. Never.")}}
+
+/* ---------- the ending ---------- */
+function ending(){const o=document.createElement("div");o.id="ending";o.className="game";o.innerHTML=`<div class="endwrap"><div class="sub">THE DARK TOWER · I</div><h2>The Gunslinger</h2><p class="echo">The world has moved on. The drawing comes next.</p><p>Based on <i>The Dark Tower: The Gunslinger</i> by Stephen King (Donald M. Grant, 1982). A non-commercial fan project. Art made in homage to Michael Whelan’s 1982 illustrations; none reproduced. All narration and dialogue original, save the two credited lines.</p><div class="row"><button class="btn" id="eT">RETURN TO THE TITLE</button></div></div>`;document.body.appendChild(o);o.querySelector("#eT").onclick=()=>{o.remove();toTitle()};setTimeout(()=>o.querySelector("#eT").focus(),100)}
+
+/* ---------- text engine ---------- */
+function clearText(){inner.innerHTML=""}
+function addLine(t,cls){const p=document.createElement("p");p.className=cls||"l";if((!cls||cls==="l")&&t.startsWith("— "))p.classList.add("said");if((!cls||cls==="l")&&chap()===2&&st.water<25)p.classList.add("parched");p.textContent=t;inner.appendChild(p);scrollDown();return p}
+function scrollDown(){requestAnimationFrame(()=>{textEl.scrollTop=textEl.scrollHeight})}
+let moreEl=null;
+function showMore(){hideMore();moreEl=document.createElement("div");moreEl.className="more";moreEl.textContent="TAP";inner.appendChild(moreEl);scrollDown()}
+function hideMore(){if(moreEl){moreEl.remove();moreEl=null}}
+function scene(){return S[st.scene]}
+function setWater(v){st.water=Math.max(0,Math.min(100,v));$("wbar").style.width=st.water+"%";const y=24-st.water*.18;$("wfill").setAttribute("d",`M2 ${y}h18v${24-y}H2z`)}
+function header(sc){const h=document.createElement("div");h.className="hdr";h.innerHTML=`<span class="t"></span><span>${ROM[+sc.id.split(".")[0]-1]} · ${sc.id.split(".")[1]}</span>`;h.querySelector(".t").textContent=sc.title;inner.appendChild(h)}
+
+function startScene(i,fromSave){st.scene=i;step=0;const sc=scene();
+ if(!fromSave){st.flags=Object.assign({},st.flags)}
+ sceneStart=JSON.parse(JSON.stringify(st));store.set(sceneStart);
+ document.body.classList.toggle("memory",sc.kind==="memory");
+ setArt(sc.art);A.play(sc.amb);clearText();header(sc);setWater(st.water);$("water").hidden=chap()>=3;updJaw();
+ $("sigil").hidden=!(st.cr&&sc.sigil);
+ advance()}
+
+function advance(){if(busy)return;const sc=scene();hideMore();
+ while(step<sc.items.length){let it=sc.items[step++];
+  if(it&&it.k)it=it.k[st.khef>0?1:0];
+  if(it&&it.pick)it=it.pick[1][st.flags[it.pick[0]]||0];
+  if(typeof it==="string"){addLine(it);showMore();return}
+  if(it.j){addLine(it.j,"l jake");showMore();return}
+  if(it.v){addLine(it.v,"l voice");showMore();return}
+  if(it.low!==undefined){if(st.water>=25)continue;addLine(it.low);showMore();return}
+  if(it.jaw!==undefined){st.jaw=it.jaw;updJaw();continue}
+  if(it.w!==undefined){setWater(it.set?it.w:st.water+it.w);continue}
+  if(it.unless){if(st.flags[it.unless[0]]===it.unless[1])continue;addLine(it.t);showMore();return}
+  if(it.c){choose(it);return}
+  const g=it.draw?cb=>drawGame(it.draw,cb):it.tull?tullGame:it.drop?dropGame:it.tarot?tarotGame:it.vision?visionGame:null;
+  if(g){busy=true;g(()=>{busy=false;advance()});return}
+  if(it.end){endChapter(it.end);return}
+ }
+ if(st.scene+1<S.length){busy=true;setTimeout(()=>{busy=false;startScene(st.scene+1)},250)}}
+
+function choose(it){busy=true;const box=document.createElement("div");box.className="choices";
+ it.opts.forEach((o,idx)=>{const b=document.createElement("button");b.textContent=o[0];b.onclick=e=>{e.stopPropagation();A.click();box.remove();st.flags[it.c]=idx;const fx=o[2]||{};if(fx.w)setWater(st.water+fx.w);if(fx.khef)st.khef+=fx.khef;addLine(o[0],"chosen");let k=0;const lines=o[1];const next=()=>{if(k<lines.length){addLine(lines[k++]);}if(k>=lines.length){busy=false;showMore()}else{showMore();pending=next}};pending=null;next()};box.appendChild(b)});
+ inner.appendChild(box);scrollDown();setTimeout(()=>{const f=box.querySelector("button");if(f&&document.activeElement===textEl)f.focus()},50)}
+let pending=null;
+function tap(){if(!$("title").hidden||document.querySelector(".ov"))return;if(pending){const p=pending;pending=null;hideMore();p();return}advance()}
+textEl.addEventListener("click",tap);
+document.addEventListener("keydown",e=>{if((e.key===" "||e.key==="Enter")&&document.activeElement&&document.activeElement.tagName!=="BUTTON"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();tap()}});
+
+/* ---------- the draw ---------- */
+const DRAWS={
+ wrists:{cap:"HOLD TO STEADY · RELEASE",res:["CLEAN. THE GUNS STAY WHERE THEY ARE.","THE GUNS STAY WHERE THEY ARE."],snd:"pop"},
+ held:{cap:"HOLD TO STEADY · RELEASE",res:["HELD. HE DOES NOT FIRE.","HELD. HE DOES NOT FIRE."],snd:""},
+ rabbit:{cap:"HOLD TO STEADY · RELEASE",res:["CLEAN.","CLEAN ENOUGH."],snd:"shot"},
+ miss:{cap:"HOLD TO STEADY · RELEASE",res:["HE FIRES. THE FIGURE IS STILL THERE.","HE FIRES. THE FIGURE IS STILL THERE."],snd:"shot"},
+ hawk:{cap:"HOLD · LOOSE",res:["LOOSED, CLEAN.","LOOSED."],snd:"whoosh"},
+ mutants:{cap:"FIRE · 5 LEFT",res:["THE CAR RUNS.","THE CAR RUNS."],snd:"shot",shots:5}
+};
+function drawGame(kind,done){const D=DRAWS[kind]||DRAWS.wrists;let left=D.shots||1;
+ const o=document.createElement("div");o.id="draw";o.innerHTML=`<div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" fill="none" stroke="#4a3a2c" stroke-width="2"/><circle cx="100" cy="100" r="34" fill="none" stroke="#C9A96E" stroke-width="2" stroke-dasharray="4 4"/><circle id="dr" cx="100" cy="100" r="88" fill="none" stroke="#E8DCC4" stroke-width="3"/></svg></div><div class="cap" id="dcap"></div>`;document.body.appendChild(o);o.querySelector("#dcap").textContent=D.cap;
+ let t0=0,held=false,raf=0,r=88,fin=false;const dr=o.querySelector("#dr");
+ const loop=ts=>{if(!held)return;const ph=((ts-t0)/900)%2;r=ph<1?88-ph*72:16+(ph-1)*72;dr.setAttribute("r",r.toFixed(1));raf=requestAnimationFrame(loop)};
+ const down=e=>{e.preventDefault();if(held||fin)return;held=true;t0=performance.now();raf=requestAnimationFrame(loop)};
+ const up=e=>{e.preventDefault();if(!held||fin)return;held=false;cancelAnimationFrame(raf);const clean=Math.abs(r-34)<12;
+  if(D.snd==="shot"){A.shot();o.style.background="#F2B24A66";setTimeout(()=>{o.style.background=""},90)}else if(D.snd==="pop")A.pop(.4);else if(D.snd==="whoosh")A.whoosh();
+  left--;if(left>0){$("dcap").textContent=`FIRE · ${left} LEFT`;dr.setAttribute("r",88);return}
+  fin=true;$("dcap").textContent=D.res[clean?0:1];document.removeEventListener("keydown",kd);document.removeEventListener("keyup",ku);setTimeout(()=>{o.remove();done()},1100)};
+ o.addEventListener("pointerdown",down);o.addEventListener("pointerup",up);o.addEventListener("pointercancel",up);
+ const kd=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();if(!held)down(e)}},ku=e=>{if(e.key===" "||e.key==="Enter")up(e)};document.addEventListener("keydown",kd);document.addEventListener("keyup",ku)}
+
+/* ---------- Tull ---------- */
+function tullGame(done){A.play("none");
+ const o=document.createElement("div");o.id="tull";o.innerHTML=`<canvas></canvas><div class="hud"><span>MEN <b id="tm">0</b></span><span>WOMEN <b id="tw">0</b></span><span>CHILDREN <b id="tc">0</b></span></div><div class="line" id="tl"></div><div class="hint" id="th">HOLD · RELEASE</div>`;document.body.appendChild(o);
+ const cv=o.querySelector("canvas"),cx=cv.getContext("2d");let w=0,h=0;const fit=()=>{const d=Math.min(2,devicePixelRatio||1);w=cv.clientWidth;h=cv.clientHeight;cv.width=w*d;cv.height=h*d;cx.setTransform(d,0,0,d,0,0)};fit();addEventListener("resize",fit);
+ // order of the dead: 39 men, 14 women, 5 children. Allie first, Sheb second, Pittston at 21.
+ const order=["A","S"];const pool=[];for(let i=0;i<38;i++)pool.push("m");for(let i=0;i<12;i++)pool.push("w");let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;for(let i=pool.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ let pi=0;for(let n=2;n<58;n++){if(n===20)order.push("P");else if([43,47,50,53,56].includes(n))order.push("c");else order.push(pool[pi++])}
+ const LINES={1:"The first shot took her in the forehead, where the scar was. She died with the word in her mouth.",2:"The second took the piano player in the throat.",6:"They did not stop. They came over the two of them and did not stop.",13:"He reloaded without looking. His hands knew where the shells were. His hands had always known.",21:"Sylvia Pittston came through them like a ship through reeds, crying out the Interloper’s name, and he shot her, and she went down in the dust and the dust closed over her.",30:"A scythe opened his arm. A brick struck his head. He did not feel them until later.",38:"Kennerly came with a pitchfork, and his daughters behind him.",46:"There were children. The gunslinger saw them, and his hands did not see them.",58:"Then there was no one."};
+ const people=[];let spawned=0;const spawn=()=>{const k=order[spawned];if(!k)return;const lane=spawned<2?0.5:.15+rnd()*.7;people.push({k,x:lane,z:spawned<2?.55:0,alive:true,fall:0,idx:spawned});spawned++};
+ spawn();spawn();for(let i=0;i<8;i++)spawn();
+ let killed=0,counts={m:0,w:0,c:0},held=false,t0=0,last=performance.now(),auto=0,flash=0,ended=false;
+ const hud=()=>{$("tm").textContent=counts.m;$("tw").textContent=counts.w;$("tc").textContent=counts.c};
+ const fire=()=>{if(ended)return;const tgt=people.filter(p=>p.alive&&p.idx===killed)[0];if(!tgt)return;tgt.alive=false;killed++;const k=tgt.k;if(k==="A"||k==="w"||k==="P")counts.w++;else if(k==="c")counts.c++;else counts.m++;hud();A.shot();flash=1;auto=0;if(LINES[killed])$("tl").textContent=LINES[killed];if(spawned<58){spawn();if(killed>4&&spawned<58)spawn()}
+  if(killed>=58){ended=true;$("th").textContent="";setTimeout(()=>{$("tl").textContent="";$("th").textContent="TAP";let gone=false;const fin=()=>{if(gone)return;gone=true;o.removeEventListener("pointerdown",fin);document.removeEventListener("keydown",fk);removeEventListener("resize",fit);o.remove();done()};const fk=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();fin()}};setTimeout(()=>{o.addEventListener("pointerdown",fin);document.addEventListener("keydown",fk)},600)},2600)}};
+ const draw=ts=>{if(!o.isConnected)return;const dt=Math.min(50,ts-last);last=ts;
+  if(!ended&&killed>=1){auto+=dt;if(auto>(killed<2?1800:1250))fire()}
+  const g=cx.createLinearGradient(0,0,0,h);g.addColorStop(0,"#5d4e63");g.addColorStop(.45,"#A997B8");g.addColorStop(1,"#C9A96E");cx.fillStyle=g;cx.fillRect(0,0,w,h);
+  const hy=a=>h*.46+(a-.5)*h*.12;cx.fillStyle="#7A5A34";cx.beginPath();cx.moveTo(0,hy(0));cx.lineTo(w,hy(1));cx.lineTo(w,h);cx.lineTo(0,h);cx.fill();
+  cx.fillStyle="rgba(232,220,196,.08)";for(let i=0;i<30;i++){cx.fillRect(((i*97+ts*.2)%(w+200))-100,(i*53)%h,80,1.5)}
+  people.forEach(p=>{if(p.alive&&p.z<.92)p.z+=dt*.00005*(p.k==="A"||p.k==="S"?0.2:1);if(!p.alive)p.fall=Math.min(1,p.fall+dt*.004)});
+  people.slice().sort((a,b)=>a.z-b.z).forEach(p=>{const s=(.35+p.z*1.5)*Math.min(w,h)/300;const x=p.x*w,y=hy(p.x)+p.z*(h*.42);cx.save();cx.translate(x,y);cx.rotate(p.fall*(p.idx%2?1.4:-1.4));cx.globalAlpha=1-p.fall*.35;
+   const col=p.k==="A"?"#E8DCC4":"#1E1712";cx.fillStyle=col;const sc=p.k==="c"?.6:(p.k==="P"?1.35:1);cx.scale(s*sc,s*sc);
+   cx.beginPath();cx.arc(0,-26,3,0,7);cx.fill();cx.beginPath();cx.moveTo(-5,-22);cx.lineTo(5,-22);cx.lineTo(p.k==="w"||p.k==="A"||p.k==="P"?9:5,0);cx.lineTo(p.k==="w"||p.k==="A"||p.k==="P"?-9:-5,0);cx.fill();
+   if(p.k==="m"&&p.idx%3===0){cx.strokeStyle=col;cx.lineWidth=1.2;cx.beginPath();cx.moveTo(4,-18);cx.lineTo(10,-36);cx.lineTo(18,-34);cx.stroke()}
+   cx.restore()});
+  if(flash>0){cx.fillStyle=`rgba(242,178,74,${flash*.35})`;cx.fillRect(0,0,w,h);flash=Math.max(0,flash-dt*.006)}
+  if(ended){cx.fillStyle="rgba(0,0,0,.25)";cx.fillRect(0,0,w,h)}
+  requestAnimationFrame(draw)};requestAnimationFrame(draw);
+ const down=e=>{e.preventDefault();if(ended)return;held=true;t0=performance.now()},up=e=>{e.preventDefault();if(!held||ended)return;held=false;fire()};
+ o.addEventListener("pointerdown",down);o.addEventListener("pointerup",up);o.addEventListener("pointercancel",up);
+ const kd=e=>{if(e.key===" "){e.preventDefault();if(!held)down(e)}},ku=e=>{if(e.key===" "){up(e)}};document.addEventListener("keydown",kd);document.addEventListener("keyup",ku);
+ const cleanup=setInterval(()=>{if(!o.isConnected){document.removeEventListener("keydown",kd);document.removeEventListener("keyup",ku);clearInterval(cleanup)}},500)}
+
+/* ---------- chapter end ---------- */
+function endChapter(n){st.done[n]=true;hideMore();busy=true;
+ if(n>=5){store.set(JSON.parse(JSON.stringify(st)));setTimeout(ending,600);return}
+ const nx=chapState(n+1,st);store.set(nx);
+ const box=document.createElement("div");box.className="choices";const e=document.createElement("p");e.className="chosen";e.style.fontStyle="normal";e.textContent=`End of Chapter ${["One","Two","Three","Four"][n-1]}.`;box.appendChild(e);
+ const b1=document.createElement("button");b1.textContent=`Go on: ${ROM[n]} · ${CHAP_NAMES[n]}`;b1.onclick=ev=>{ev.stopPropagation();begin(nx,true)};box.appendChild(b1);
+ const b2=document.createElement("button");b2.textContent="Return to the title";b2.onclick=ev=>{ev.stopPropagation();toTitle()};box.appendChild(b2);
+ inner.appendChild(box);scrollDown();setTimeout(()=>b1.focus(),60)}
+
+/* ---------- overlays ---------- */
+function overlay(html){const o=document.createElement("div");o.className="ov";o.innerHTML=`<div class="card">${html}</div>`;o.addEventListener("click",e=>{if(e.target===o)o.remove()});$("ovHost").appendChild(o);return o}
+$("sigil").onclick=()=>{const sc=scene();const o=overlay(`<div class="echo-h">◈ CONSTANT READER</div><p class="echo"></p><div class="row"><button class="btn">CLOSE</button></div>`);o.querySelector(".echo").textContent=SIGILS[sc.sigil];o.querySelector("button").onclick=()=>o.remove()};
+$("menuBtn").onclick=()=>{const code=btoa(unescape(encodeURIComponent(JSON.stringify(sceneStart||st))));
+ const o=overlay(`<h2>The Road So Far</h2><p style="color:#A89478;font-size:14px">The game saves at the start of each scene. Copy this code to carry your place to another device.</p><textarea id="codeOut" readonly aria-label="Save code"></textarea><div class="row"><button class="btn" id="mCopy">COPY CODE</button><button class="btn" id="mSnd"></button><button class="btn" id="mCr"></button><button class="btn" id="mTitle">TITLE</button><button class="btn" id="mClose">CLOSE</button></div>`);
+ o.querySelector("#codeOut").value=code;const sb=o.querySelector("#mSnd"),cb=o.querySelector("#mCr");const lab=()=>{sb.textContent=st.sound?"SOUND: ON":"SOUND: OFF";cb.textContent=st.cr?"ECHOES: ON":"ECHOES: OFF"};lab();
+ sb.onclick=()=>{st.sound=!st.sound;A.mute(st.sound);lab()};cb.onclick=()=>{st.cr=!st.cr;$("sigil").hidden=!(st.cr&&scene().sigil);$("crToggle").checked=st.cr;lab()};
+ o.querySelector("#mCopy").onclick=e=>{const ta=o.querySelector("#codeOut");const btn=e.currentTarget;navigator.clipboard.writeText(ta.value).then(()=>{btn.textContent="COPIED"},()=>{ta.select();btn.textContent="SELECTED · COPY IT"})};
+ o.querySelector("#mTitle").onclick=()=>{o.remove();toTitle()};o.querySelector("#mClose").onclick=()=>o.remove()};
+
+function toTitle(){busy=false;pending=null;$("title").hidden=false;A.play("wind");refreshTitle()}
+function refreshTitle(){const s=store.get();$("bCont").hidden=!s;$("crToggle").checked=!!(s?s.cr:st.cr);$("titlePlate").innerHTML=ART.title();const sp=$("titlePlate").querySelector(".speck");if(sp&&!RM){let t=0;const f=()=>{if(!sp.isConnected||$("title").hidden)return;t+=.02;sp.setAttribute("transform",`translate(${Math.sin(t)*6} 0)`);requestAnimationFrame(f)};f()}}
+function begin(state,fromSave){A.init();A.mute(state.sound);st=state;$("title").hidden=true;busy=false;pending=null;artKey="";startScene(st.scene,fromSave)}
+$("bBegin").onclick=()=>{const s=fresh();s.cr=$("crToggle").checked;begin(s,false)};
+$("bCont").onclick=()=>{const s=store.get();if(!s)return;s.cr=$("crToggle").checked;begin(s,true)};
+$("crToggle").onchange=()=>{st.cr=$("crToggle").checked;const s=store.get();if(s){s.cr=st.cr;store.set(s)}};
+$("bChap").onclick=()=>{const s=store.get()||fresh();const done=s.done||{};
+ const o=overlay(`<h2>Chapters</h2>${CHAP_NAMES.map((n,i)=>{const c=i+1,open=c===1||done[c-1]||done[c];return`<div class="chap"><span>${ROM[i]} · ${n}</span>${open?`<button class="btn" data-n="${c}">PLAY</button>`:`<small>finish ${ROM[i-1]} first</small>`}</div>`}).join("")}<div class="row"><button class="btn" id="cLoad">LOAD A SAVE CODE</button><button class="btn" id="cClose">CLOSE</button></div>`);
+ o.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{o.remove();const n=+b.dataset.n;begin(chapState(n,{cr:$("crToggle").checked,sound:s.sound!==false,done,khef:0,flags:{}}),false)});
+ o.querySelector("#cClose").onclick=()=>o.remove();
+ o.querySelector("#cLoad").onclick=()=>{o.remove();const l=overlay(`<h2>Load a Save Code</h2><textarea id="codeIn" aria-label="Paste save code"></textarea><p id="lerr" style="color:#F2622A;font-size:14px"></p><div class="row"><button class="btn" id="lGo">LOAD</button><button class="btn" id="lX">CLOSE</button></div>`);
+  l.querySelector("#lX").onclick=()=>l.remove();l.querySelector("#lGo").onclick=()=>{try{const v=JSON.parse(decodeURIComponent(escape(atob(l.querySelector("#codeIn").value.trim()))));if(typeof v.scene!=="number"||!S[v.scene])throw 0;l.remove();store.set(v);begin(v,true)}catch(e){l.querySelector("#lerr").textContent="That code didn’t read. Copy the whole code from the menu and paste it here."}}}};
+$("jawBtn").onclick=()=>{const o=overlay(`<div class="echo-h">THE JAWBONE</div><p class="echo"></p><div class="row"><button class="btn">CLOSE</button></div>`);o.querySelector(".echo").textContent=JAWLINES[chap()]||JAWLINES[2];o.querySelector("button").onclick=()=>o.remove()};
+$("bCred").onclick=()=>{const o=overlay(`<h2>Credits</h2><p>Based on <i>The Dark Tower: The Gunslinger</i> by Stephen King (Donald M. Grant, 1982). A non-commercial fan project.</p><p>Art made in homage to Michael Whelan’s 1982 illustrations; none reproduced. All narration and dialogue original, save the two credited lines.</p><div id="nods"></div><div class="row"><button class="btn">CLOSE</button></div>`);
+ if($("crToggle").checked){o.querySelector("#nods").innerHTML=`<div class="echo-h">◈ CONSTANT READER</div>`+NODS.map(n=>`<p class="echo" style="font-size:16px"></p>`).join("");o.querySelectorAll("#nods .echo").forEach((p,i)=>p.textContent=NODS[i])}
+ o.querySelector("button").onclick=()=>o.remove()};
+$("title").addEventListener("pointerdown",()=>{A.init();A.play("wind")},{once:true});
+
+refreshTitle();
+try{if(location.hostname.endsWith("github.io")&&"serviceWorker" in navigator)navigator.serviceWorker.register("sw.js")}catch(e){}
+window.__gs={S,get st(){return st},tap,startScene};
+})();
+</script>
