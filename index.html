@@ -1282,7 +1282,7 @@ $("bCred").onclick=()=>{const o=overlay(`<h2>Credits</h2><p>Based on <i>The Dark
 $("title").addEventListener("pointerdown",()=>{A.init();A.play("wind")},{once:true});
 
 refreshTitle();
-try{if(location.hostname.endsWith("github.io")&&"serviceWorker" in navigator)navigator.serviceWorker.register("sw.js")}catch(e){}
+try{if(location.hostname.endsWith("github.io")&&"serviceWorker" in navigator){let had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!had){had=true;return}const mk=host=>{if(!host||host.querySelector(".upd"))return;const u=document.createElement("button");u.className=(host.id==="belt"?"ib":"btn")+" upd";u.textContent="UPDATE READY";u.style.borderColor="#F2622A";u.style.color="#F2622A";u.onclick=()=>location.reload();host.insertBefore(u,host.firstChild)};mk($("belt"));mk(document.querySelector("#title .menu"))});navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{})}}catch(e){}
 window.__gs={S,get st(){return st},tap,startScene};
 })();
 </script>
