@@ -1181,7 +1181,7 @@ function advance(){if(busy)return;const sc=scene();hideMore();
   if(it.unless){if(st.flags[it.unless[0]]===it.unless[1])continue;addLine(it.t);showMore();return}
   if(it.c){choose(it);return}
   const g=it.draw?cb=>drawGame(it.draw,cb):it.tull?tullGame:it.drop?dropGame:it.tarot?tarotGame:it.vision?visionGame:null;
-  if(g){busy=true;g(()=>{busy=false;advance()});return}
+  if(g){busy=true;g(()=>{busy=false;quietUntil=performance.now()+600;advance()});return}
   if(it.end){endChapter(it.end);return}
  }
  if(st.scene+1<S.length){busy=true;setTimeout(()=>{busy=false;startScene(st.scene+1)},250)}}
@@ -1189,8 +1189,8 @@ function advance(){if(busy)return;const sc=scene();hideMore();
 function choose(it){busy=true;const box=document.createElement("div");box.className="choices";
  it.opts.forEach((o,idx)=>{const b=document.createElement("button");b.textContent=o[0];b.onclick=e=>{e.stopPropagation();A.click();box.remove();st.flags[it.c]=idx;const fx=o[2]||{};if(fx.w)setWater(st.water+fx.w);if(fx.khef)st.khef+=fx.khef;addLine(o[0],"chosen");let k=0;const lines=o[1];const next=()=>{if(k<lines.length){addLine(lines[k++]);}if(k>=lines.length){busy=false;showMore()}else{showMore();pending=next}};pending=null;next()};box.appendChild(b)});
  inner.appendChild(box);scrollDown();setTimeout(()=>{const f=box.querySelector("button");if(f&&document.activeElement===textEl)f.focus()},50)}
-let pending=null;
-function tap(){if(!$("title").hidden||document.querySelector(".ov"))return;if(pending){const p=pending;pending=null;hideMore();p();return}advance()}
+let pending=null,quietUntil=0;
+function tap(){if(performance.now()<quietUntil)return;if(!$("title").hidden||document.querySelector(".ov"))return;if(pending){const p=pending;pending=null;hideMore();p();return}advance()}
 textEl.addEventListener("click",tap);
 document.addEventListener("keydown",e=>{if((e.key===" "||e.key==="Enter")&&document.activeElement&&document.activeElement.tagName!=="BUTTON"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();tap()}});
 
