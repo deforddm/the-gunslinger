@@ -1211,7 +1211,10 @@ function drawGame(kind,done){const D=DRAWS[kind]||DRAWS.wrists;let left=D.shots|
  const up=e=>{e.preventDefault();if(!held||fin)return;held=false;cancelAnimationFrame(raf);const clean=Math.abs(r-34)<12;
   if(D.snd==="shot"){A.shot();o.style.background="#F2B24A66";setTimeout(()=>{o.style.background=""},90)}else if(D.snd==="pop")A.pop(.4);else if(D.snd==="whoosh")A.whoosh();
   left--;if(left>0){$("dcap").textContent=`FIRE · ${left} LEFT`;dr.setAttribute("r",88);return}
-  fin=true;$("dcap").textContent=D.res[clean?0:1];document.removeEventListener("keydown",kd);document.removeEventListener("keyup",ku);setTimeout(()=>{o.remove();done()},1100)};
+  fin=true;$("dcap").textContent=D.res[clean?0:1];document.removeEventListener("keydown",kd);document.removeEventListener("keyup",ku);
+  const hint=document.createElement("div");hint.className="cap";hint.style.opacity=".6";hint.textContent="TAP TO GO ON";
+  setTimeout(()=>{o.appendChild(hint);let gone=false;const close=ev=>{if(ev)ev.preventDefault();if(gone)return;gone=true;document.removeEventListener("keydown",ck);o.remove();done()};
+   const ck=ev=>{if(ev.key===" "||ev.key==="Enter")close(ev)};o.addEventListener("click",close);document.addEventListener("keydown",ck)},500)};
  o.addEventListener("pointerdown",down);o.addEventListener("pointerup",up);o.addEventListener("pointercancel",up);
  const kd=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();if(!held)down(e)}},ku=e=>{if(e.key===" "||e.key==="Enter")up(e)};document.addEventListener("keydown",kd);document.addEventListener("keyup",ku)}
 
