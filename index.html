@@ -138,6 +138,15 @@ blockquote.last cite{display:block;font-style:normal;font-family:var(--f-body);f
 #ending .sub{font-family:var(--f-display);letter-spacing:.22em;font-size:12px;color:var(--dust)}
 #ending h2{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,9vw,54px);margin:0}
 #ending p{line-height:1.6;margin:0;color:#CDBB98}
+.reread .card{background:var(--bone);color:var(--ink);--text:var(--ink);--muted:var(--inkSoft);--rule:#CDBB98;--voice:#6A2E18;max-width:640px;display:flex;flex-direction:column;gap:12px;max-height:100%;padding:16px 18px}
+.reread .card.mem{background:#2A2019;color:#E8DCC4;--text:#E8DCC4;--muted:#A89478;--rule:#4A3A2C;--voice:#D9A57A}
+.reread .rr-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.reread .rr-body{overflow-y:auto;min-height:0;flex:1;display:flex;flex-direction:column;gap:.85em;padding-right:4px}
+.reread .rr-body p.l,.reread .rr-body p.chosen{animation:none}
+.reread .btn{color:inherit;border-color:var(--sienna)}
+.reread .btn[disabled]{opacity:.3}
+.reread .rr-nav{justify-content:space-between;margin-top:0}
+.reread .echo-h{color:var(--muted);margin:0}
 @media (prefers-reduced-motion:reduce){p.l,p.chosen{animation:none}.more{animation:none}.card7.burn .face{animation:none;opacity:0}#art .fade{transition:none}}
 </style>
 </head>
@@ -150,6 +159,7 @@ blockquote.last cite{display:block;font-style:normal;font-family:var(--f-body);f
   <div id="belt">
     <div id="water" title="Water"><svg viewBox="0 0 22 26" aria-hidden="true"><path d="M7 2h8v3c4 2 6 6 6 11 0 5-4 8-10 8S1 21 1 16c0-5 2-9 6-11z" fill="none" stroke="#C9A96E" stroke-width="1.4"/><path id="wfill" d="M2 16h18c0 5-4 7-9 7s-9-2-9-7z" fill="#C9A96E"/></svg><div class="bar"><i id="wbar" style="width:60%"></i></div></div>
     <div class="sp"></div>
+    <button class="ib" id="backBtn" hidden aria-label="Re-read earlier sections">‹ BACK</button>
     <button class="ib" id="jawBtn" hidden>JAWBONE</button>
     <button class="ib" id="sigil" hidden>ECHO</button>
     <button class="ib" id="menuBtn" aria-label="Menu">MENU</button>
@@ -1165,7 +1175,7 @@ function startScene(i,fromSave){st.scene=i;step=0;const sc=scene();
  if(!fromSave){st.flags=Object.assign({},st.flags)}
  sceneStart=JSON.parse(JSON.stringify(st));store.set(sceneStart);
  document.body.classList.toggle("memory",sc.kind==="memory");
- setArt(sc.art);A.play(sc.amb);clearText();header(sc);setWater(st.water);$("water").hidden=chap()>=3;updJaw();
+ setArt(sc.art);A.play(sc.amb);clearText();header(sc);setWater(st.water);$("water").hidden=chap()>=3;updJaw();updBack();
  $("sigil").hidden=!(st.cr&&sc.sigil);
  advance()}
 
@@ -1186,8 +1196,22 @@ function advance(){if(busy)return;const sc=scene();hideMore();
   if(it.end){endChapter(it.end);return}
  }
  if(st.scene+1<S.length)showProceed()}
+const LOGKEY="gunslinger.log.v1";let logbook=(()=>{try{return JSON.parse(localStorage.getItem(LOGKEY)||"[]")}catch(e){return[]}})();
+function updBack(){const b=$("backBtn");if(b)b.hidden=!logbook.length}
+function archive(){const sc=scene();const c=inner.cloneNode(true);c.querySelectorAll(".choices,.more").forEach(n=>n.remove());
+ logbook=logbook.filter(e=>e.id!==sc.id);logbook.push({id:sc.id,kind:sc.kind,html:c.innerHTML});if(logbook.length>60)logbook=logbook.slice(-60);
+ try{localStorage.setItem(LOGKEY,JSON.stringify(logbook))}catch(e){}updBack()}
+function reread(){if(!logbook.length)return;let i=logbook.length-1;
+ const o=document.createElement("div");o.className="ov reread";o.innerHTML=`<div class="card"><div class="rr-top"><span class="echo-h">LOOKING BACK</span><button class="btn" id="rrX">CLOSE</button></div><div class="rr-body" id="rrB"></div><div class="row rr-nav"><button class="btn" id="rrE">‹ EARLIER</button><button class="btn" id="rrL">LATER ›</button></div></div>`;
+ $("ovHost").appendChild(o);const body=o.querySelector("#rrB"),card=o.querySelector(".card");
+ const show=()=>{const e=logbook[i];body.innerHTML=e.html;card.classList.toggle("mem",e.kind==="memory");body.scrollTop=0;card.scrollTop=0;o.querySelector("#rrE").disabled=i<=0;o.querySelector("#rrL").disabled=i>=logbook.length-1};
+ o.querySelector("#rrE").onclick=()=>{if(i>0){i--;show()}};o.querySelector("#rrL").onclick=()=>{if(i<logbook.length-1){i++;show()}};
+ const close=()=>{o.remove();document.removeEventListener("keydown",kk)};o.querySelector("#rrX").onclick=close;o.addEventListener("click",e=>{if(e.target===o)close()});
+ const kk=e=>{if(e.key==="Escape")close();if(e.key==="ArrowLeft")o.querySelector("#rrE").click();if(e.key==="ArrowRight")o.querySelector("#rrL").click()};document.addEventListener("keydown",kk);
+ show();setTimeout(()=>o.querySelector("#rrX").focus(),50)}
+$("backBtn").onclick=reread;
 function showProceed(){hideMore();busy=true;const box=document.createElement("div");box.className="choices proceed";const b=document.createElement("button");b.textContent="Proceed ›";
- b.onclick=e=>{e.stopPropagation();A.click();box.remove();busy=false;startScene(st.scene+1)};box.appendChild(b);inner.appendChild(box);scrollDown();setTimeout(()=>{try{b.focus({preventScroll:true})}catch(_){}},60)}
+ b.onclick=e=>{e.stopPropagation();A.click();box.remove();archive();busy=false;startScene(st.scene+1)};box.appendChild(b);inner.appendChild(box);scrollDown();setTimeout(()=>{try{b.focus({preventScroll:true})}catch(_){}},60)}
 
 function choose(it){busy=true;const box=document.createElement("div");box.className="choices";
  it.opts.forEach((o,idx)=>{const b=document.createElement("button");b.textContent=o[0];b.onclick=e=>{e.stopPropagation();A.click();box.remove();st.flags[it.c]=idx;const fx=o[2]||{};if(fx.w)setWater(st.water+fx.w);if(fx.khef)st.khef+=fx.khef;addLine(o[0],"chosen");let k=0;const lines=o[1];const next=()=>{if(k<lines.length){addLine(lines[k++]);}if(k>=lines.length){busy=false;showMore()}else{showMore();pending=next}};pending=null;next()};box.appendChild(b)});
@@ -1259,7 +1283,7 @@ function endChapter(n){st.done[n]=true;hideMore();busy=true;
  if(n>=5){store.set(JSON.parse(JSON.stringify(st)));setTimeout(ending,600);return}
  const nx=chapState(n+1,st);store.set(nx);
  const box=document.createElement("div");box.className="choices";const e=document.createElement("p");e.className="chosen";e.style.fontStyle="normal";e.textContent=`End of Chapter ${["One","Two","Three","Four"][n-1]}.`;box.appendChild(e);
- const b1=document.createElement("button");b1.textContent=`Go on: ${ROM[n]} · ${CHAP_NAMES[n]}`;b1.onclick=ev=>{ev.stopPropagation();begin(nx,true)};box.appendChild(b1);
+ const b1=document.createElement("button");b1.textContent=`Go on: ${ROM[n]} · ${CHAP_NAMES[n]}`;b1.onclick=ev=>{ev.stopPropagation();box.remove();archive();begin(nx,true)};box.appendChild(b1);
  const b2=document.createElement("button");b2.textContent="Return to the title";b2.onclick=ev=>{ev.stopPropagation();toTitle()};box.appendChild(b2);
  inner.appendChild(box);scrollDown();setTimeout(()=>b1.focus(),60)}
 
@@ -1276,7 +1300,7 @@ $("menuBtn").onclick=()=>{const code=btoa(unescape(encodeURIComponent(JSON.strin
 function toTitle(){busy=false;pending=null;$("title").hidden=false;A.play("wind");refreshTitle()}
 function refreshTitle(){const s=store.get();$("bCont").hidden=!s;$("crToggle").checked=!!(s?s.cr:st.cr);$("titlePlate").innerHTML=ART.title();const sp=$("titlePlate").querySelector(".speck");if(sp&&!RM){let t=0;const f=()=>{if(!sp.isConnected||$("title").hidden)return;t+=.02;sp.setAttribute("transform",`translate(${Math.sin(t)*6} 0)`);requestAnimationFrame(f)};f()}}
 function begin(state,fromSave){A.init();A.mute(state.sound);st=state;$("title").hidden=true;busy=false;pending=null;artKey="";startScene(st.scene,fromSave)}
-$("bBegin").onclick=()=>{const s=fresh();s.cr=$("crToggle").checked;begin(s,false)};
+$("bBegin").onclick=()=>{logbook=[];try{localStorage.removeItem(LOGKEY)}catch(e){}const s=fresh();s.cr=$("crToggle").checked;begin(s,false)};
 $("bCont").onclick=()=>{const s=store.get();if(!s)return;s.cr=$("crToggle").checked;begin(s,true)};
 $("crToggle").onchange=()=>{st.cr=$("crToggle").checked;const s=store.get();if(s){s.cr=st.cr;store.set(s)}};
 $("bChap").onclick=()=>{const s=store.get()||fresh();const done=s.done||{};
