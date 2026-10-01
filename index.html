@@ -49,6 +49,7 @@ p.chosen::before{content:"— "}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .choices{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .choices button{text-align:left;background:transparent;border:1px solid var(--rule);border-left:3px solid var(--sienna);padding:11px 14px;font-family:var(--f-italic);font-size:16.5px;color:var(--text);cursor:pointer;border-radius:2px}
+.choices.proceed{align-items:flex-end}.choices.proceed button{border-left-width:1px;border-color:var(--sienna);font-family:var(--f-display);font-size:14px;letter-spacing:.16em;text-transform:uppercase;padding:10px 18px}
 .choices button:hover,.choices button:focus-visible{background:#8A4B2214;outline:none;border-color:var(--sienna)}
 .more{align-self:center;font-family:var(--f-display);font-size:12px;letter-spacing:.3em;color:var(--muted);opacity:.7;animation:breathe 2.4s ease-in-out infinite;user-select:none;padding:6px}
 @keyframes breathe{50%{opacity:.25}}
@@ -1184,7 +1185,9 @@ function advance(){if(busy)return;const sc=scene();hideMore();
   if(g){busy=true;g(()=>{busy=false;quietUntil=performance.now()+600;advance()});return}
   if(it.end){endChapter(it.end);return}
  }
- if(st.scene+1<S.length){busy=true;setTimeout(()=>{busy=false;startScene(st.scene+1)},250)}}
+ if(st.scene+1<S.length)showProceed()}
+function showProceed(){hideMore();busy=true;const box=document.createElement("div");box.className="choices proceed";const b=document.createElement("button");b.textContent="Proceed ›";
+ b.onclick=e=>{e.stopPropagation();A.click();box.remove();busy=false;startScene(st.scene+1)};box.appendChild(b);inner.appendChild(box);scrollDown();setTimeout(()=>{try{b.focus({preventScroll:true})}catch(_){}},60)}
 
 function choose(it){busy=true;const box=document.createElement("div");box.className="choices";
  it.opts.forEach((o,idx)=>{const b=document.createElement("button");b.textContent=o[0];b.onclick=e=>{e.stopPropagation();A.click();box.remove();st.flags[it.c]=idx;const fx=o[2]||{};if(fx.w)setWater(st.water+fx.w);if(fx.khef)st.khef+=fx.khef;addLine(o[0],"chosen");let k=0;const lines=o[1];const next=()=>{if(k<lines.length){addLine(lines[k++]);}if(k>=lines.length){busy=false;showMore()}else{showMore();pending=next}};pending=null;next()};box.appendChild(b)});
