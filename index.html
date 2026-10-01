@@ -53,17 +53,20 @@ p.chosen::before{content:"— "}
 .choices button:hover,.choices button:focus-visible{background:#8A4B2214;outline:none;border-color:var(--sienna)}
 .more{align-self:center;font-family:var(--f-display);font-size:12px;letter-spacing:.3em;color:var(--muted);opacity:.7;animation:breathe 2.4s ease-in-out infinite;user-select:none;padding:6px}
 @keyframes breathe{50%{opacity:.25}}
-#belt{display:flex;align-items:center;gap:14px;padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));background:var(--umber);color:var(--bone);border-top:1px solid #3a2c20}
-#water{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--dust)}
+#belt{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;overflow:hidden;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--umber);color:var(--bone);border-top:1px solid #3a2c20}
+#water{display:flex;align-items:center;gap:6px;min-width:0;flex:0 1 auto;font-family:var(--f-display);font-size:12px;letter-spacing:.14em;color:var(--dust)}
 #water svg{width:22px;height:26px}
-#water .bar{width:74px;height:5px;background:#3a2c20;border-radius:3px;overflow:hidden}
+#water .bar{width:74px;min-width:24px;flex:0 1 74px;height:5px;background:#3a2c20;border-radius:3px;overflow:hidden}
 #water .bar i{display:block;height:100%;background:var(--dust);transition:width .8s}
-#belt .sp{flex:1}
-.ib{background:none;border:1px solid #3a2c20;border-radius:3px;color:var(--bone);padding:6px 10px;cursor:pointer;font-family:var(--f-display);font-size:12px;letter-spacing:.14em}
+#belt .sp{flex:1 1 0;min-width:0}
+.ib{flex:0 0 auto;white-space:nowrap;background:none;border:1px solid #3a2c20;border-radius:3px;color:var(--bone);padding:7px 8px;cursor:pointer;font-family:var(--f-display);font-size:12px;letter-spacing:.08em;line-height:1}
+@media (max-width:374px){.ib{padding:7px 6px;font-size:11px;letter-spacing:.04em}#water .bar{display:none}}
 .ib:focus-visible{outline:2px solid var(--dust)}
 #sigil{border-color:var(--lavender);color:var(--lavender)}
 #sigil[hidden]{display:none!important}
 #sigil::before{content:"◈ ";}
+#app{width:100%;min-width:0}
+html,body{max-width:100%;overflow-x:hidden}
 /* overlays */
 .ov{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#120d0aee;padding:20px 16px}
 .card{width:100%;max-width:520px;max-height:100%;overflow:auto;background:var(--umber);border:1px solid #4a3a2c;padding:24px 22px;color:var(--bone)}
@@ -160,7 +163,7 @@ blockquote.last cite{display:block;font-style:normal;font-family:var(--f-body);f
     <div id="water" title="Water"><svg viewBox="0 0 22 26" aria-hidden="true"><path d="M7 2h8v3c4 2 6 6 6 11 0 5-4 8-10 8S1 21 1 16c0-5 2-9 6-11z" fill="none" stroke="#C9A96E" stroke-width="1.4"/><path id="wfill" d="M2 16h18c0 5-4 7-9 7s-9-2-9-7z" fill="#C9A96E"/></svg><div class="bar"><i id="wbar" style="width:60%"></i></div></div>
     <div class="sp"></div>
     <button class="ib" id="backBtn" hidden aria-label="Re-read earlier sections">‹ BACK</button>
-    <button class="ib" id="jawBtn" hidden>JAWBONE</button>
+    <button class="ib" id="jawBtn" hidden aria-label="Jawbone">JAW</button>
     <button class="ib" id="sigil" hidden>ECHO</button>
     <button class="ib" id="menuBtn" aria-label="Menu">MENU</button>
   </div>
