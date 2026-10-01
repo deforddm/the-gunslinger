@@ -27,6 +27,7 @@
   --f-body:"Spectral",Georgia,"Times New Roman",serif;
   color-scheme:dark;
 }
+*,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
 body{background:var(--umber);color:var(--bone);font-family:var(--f-body);overflow:hidden;-webkit-tap-highlight-color:transparent}
@@ -93,7 +94,7 @@ textarea{width:100%;min-height:80px;background:#120d0a;color:var(--bone);border:
 #title cite{display:block;font-style:normal;font-family:var(--f-body);font-size:12px;color:#A89478;margin-top:4px}
 #title .adult{font-size:13px;color:#A89478}
 #title .menu{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-#title label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--bone);margin-top:4px;cursor:pointer}
+#title label{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:14px;color:var(--bone);margin-top:4px;cursor:pointer}
 #title input[type=checkbox]{accent-color:var(--lavender);width:18px;height:18px}
 /* draw */
 #draw{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#120d0ad0;touch-action:none;user-select:none;-webkit-user-select:none}
